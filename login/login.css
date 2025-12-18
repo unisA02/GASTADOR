@@ -18,10 +18,14 @@
 
   .login-btn {
     @apply w-full bg-orange-500 text-white font-semibold
-           py-2 px-4 rounded-md hover:bg-orange-600 transition;
+           py-2 px-4 rounded-md
+           border-2 border-orange-600
+           hover:bg-orange-600 hover:border-orange-700
+           transition mb-6; /* 👈 adds space below button */
   }
 
   .login-link {
-    @apply block text-center text-sm text-orange-600 hover:underline mt-3;
+    @apply block text-center text-sm text-orange-600
+           hover:underline mt-6; /* 👈 more distance */
   }
 }
