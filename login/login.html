@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-gray-100 dark:bg-gray-900">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="login.css">
+  </head>
+
+  <body class="flex items-center justify-center min-h-screen">
+    <form id="loginForm" class="login-form max-w-md w-full p-8 rounded-lg shadow-lg dark:bg-gray-800 bg-white">
+      <h2 class="login-title">Login</h2>
+
+      <input
+        type="text"
+        id="username"
+        class="login-input"
+        placeholder="Username"
+        required
+      />
+
+      <input
+        type="password"
+        id="password"
+        class="login-input"
+        placeholder="Password"
+        required
+      />
+
+      <button type="submit" class="login-btn">
+        Login
+      </button>
+
+      <a href="register.html" class="login-link">
+        Go to Register
+      </a>
+    </form>
+
+    <script src="login.js"></script>
+  </body>
+</html>

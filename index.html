@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expense Tracker App</title>
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-orange-50 min-h-screen flex items-center justify-center p-4">
+
+    <!-- Dark/Light Mode Toggle -->
+    <button id="theme-toggle" class="p-2 rounded-full hover:bg-orange-100 fixed top-4 right-4 z-50">
+        <i class="fas fa-sun text-orange-500"></i>
+    </button>
+
+    <div class="bg-white w-full max-w-3xl rounded-xl shadow-lg p-6 space-y-6">
+
+        <h1 class="text-3xl font-bold text-orange-600 text-center">
+            Expense Tracker App
+        </h1>
+
+        <!-- Add Transaction Button -->
+        <div class="text-center">
+            <button id="open-modal-btn" class="bg-orange-600 text-white py-2 px-4 rounded-md hover:bg-orange-700 transition-all">
+                Add Transaction
+            </button>
+        </div>
+
+        <!-- Expense Table -->
+        <div class="overflow-x-auto">
+            <table class="w-full border border-gray-200 rounded-lg overflow-hidden">
+                <thead class="bg-orange-100">
+                    <tr>
+                        <th class="th">Category</th>
+                        <th class="th">Amount</th>
+                        <th class="th">Date</th>
+                        <th class="th">Delete</th>
+                    </tr>
+                </thead>
+                <tbody id="expense-table-body" class="text-center"></tbody>
+                <tfoot class="bg-orange-50 font-semibold">
+                    <tr>
+                        <td class="td">Total</td>
+                        <td id="total-amount" class="td text-orange-600"></td>
+                        <td class="td"></td>
+                        <td class="td"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 space-y-4 relative">
+            <h2 class="text-xl font-bold text-orange-600 text-center">Add Transaction</h2>
+
+            <!-- Modal Inputs -->
+            <div class="grid grid-cols-1 gap-4">
+                <select id="modal-category-select" class="input border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <option value="Select">Select Category</option>
+                    <option>Travel</option>
+                    <option>Laundry</option>
+                    <option>Daily Meals</option>
+                    <option>Groceries</option>
+                    <option>Academic</option>
+                    <option>Rent & Utilities</option>
+                    <option>Gym</option>
+                </select>
+
+                <input type="number" id="modal-amount-input" placeholder="Amount" class="input border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                <input type="date" id="modal-date-input" class="input border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500" />
+
+                <button id="modal-add-btn" class="bg-orange-600 text-white py-2 px-4 rounded-md hover:bg-orange-700 transition-all w-full">
+                    Add
+                </button>
+            </div>
+
+            <!-- Close Button -->
+            <button id="close-modal-btn" class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-lg font-bold">
+                ✕
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

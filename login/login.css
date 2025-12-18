@@ -1,0 +1,27 @@
+/* THIS MUST BE FIRST */
+@reference utilities;
+
+@layer components {
+    .login-form {
+    @apply bg-red-500;
+    }
+
+
+  .login-title {
+    @apply text-2xl font-semibold text-center mb-4;
+  }
+
+  .login-input {
+    @apply w-full border border-gray-300 rounded-md p-2 mb-3
+           focus:outline-none focus:ring-2 focus:ring-orange-500;
+  }
+
+  .login-btn {
+    @apply w-full bg-orange-500 text-white font-semibold
+           py-2 px-4 rounded-md hover:bg-orange-600 transition;
+  }
+
+  .login-link {
+    @apply block text-center text-sm text-orange-600 hover:underline mt-3;
+  }
+}
