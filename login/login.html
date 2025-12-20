@@ -5,50 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
 
-    <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="../dist/output.css">
   </head>
 
   <body class="flex items-center justify-center min-h-screen">
-    <form id="loginForm" class="login-form max-w-md w-full p-8 rounded-lg shadow-lg dark:bg-gray-800 bg-white">
-      <h2 class="login-title">Login</h2>
+    <form id="loginForm" class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full flex flex-col">
+      <h2 class="text-2xl font-semibold mb-6 text-gray-800">Login</h2>
 
-      <input
-        type="text"
-        id="username"
-        class="login-input"
-        placeholder="Username"
-        required
-      />
+      <input type="text" id="username" 
+             class="w-full border-b-2 border-gray-300 py-2 mb-4 focus:outline-none focus:border-orange-500" 
+             placeholder="Username" required />
+      
+      <input type="password" id="password" 
+             class="w-full border-b-2 border-gray-300 py-2 mb-8 focus:outline-none focus:border-orange-500" 
+             placeholder="Password" required />
 
-      <input
-        type="password"
-        id="password"
-        class="login-input"
-        placeholder="Password"
-        required
-      />
-
-      <button
-      href="index.html"  
-      type="submit"
-        class="w-full bg-orange-500 text-white font-semibold
-              py-2 px-4 rounded-md
-              border-2 border-orange-600
-              hover:bg-orange-600 hover:border-orange-700
-              transition mb-8">
+      <button type="submit" 
+              class="w-full bg-orange-500 text-white font-semibold py-3 rounded-md hover:bg-orange-600 transition-colors">
         Login
       </button>
 
-      <a
-        href="../register/register.html"
-        class="block text-center text-sm text-orange-600
-              hover:underline mt-8">
-
+      <a href="../register/register.html" 
+         class="text-center text-sm text-orange-600 hover:underline mt-4">
         Go to Register
       </a>
     </form>
