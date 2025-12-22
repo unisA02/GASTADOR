@@ -1,102 +1,124 @@
-// Expense Elements
-const tableBody = document.getElementById("expense-table-body");
-const totalAmountEl = document.getElementById("total-amount");
+// ... existing constants ...
+const form = document.getElementById("transaction-form");
+const list = document.getElementById("list");
+const balanceEl = document.getElementById("balance");
+const incomeEl = document.getElementById("income");
+const expenseEl = document.getElementById("expense");
 
-let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+const categoryInput = document.getElementById("category");
+const amountInput = document.getElementById("amount");
+const dateInput = document.getElementById("date");
 
-// Modal Elements
-const openModalBtn = document.getElementById("open-modal-btn");
-const closeModalBtn = document.getElementById("close-modal-btn");
-const modal = document.getElementById("modal");
+const expenseBtn = document.getElementById("type-expense");
+const incomeBtn = document.getElementById("type-income");
 
-const categorySelectModal = document.getElementById("modal-category-select");
-const amountInputModal = document.getElementById("modal-amount-input");
-const dateInputModal = document.getElementById("modal-date-input");
-const addBtnModal = document.getElementById("modal-add-btn");
+let transactionType = "expense";
+let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 
-// Open Modal
-openModalBtn.addEventListener("click", () => modal.classList.remove("hidden"));
+/* 🔄 TOGGLE TYPE */
+expenseBtn.onclick = () => setType("expense");
+incomeBtn.onclick = () => setType("income");
 
-// Close Modal
-closeModalBtn.addEventListener("click", () => modal.classList.add("hidden"));
+function setType(type) {
+    transactionType = type;
+    if (type === "expense") {
+        expenseBtn.className = "flex-1 py-2 rounded-lg bg-red-500 text-white font-semibold transition-all";
+        incomeBtn.className = "flex-1 py-2 rounded-lg text-gray-500 dark:text-gray-400 font-semibold transition-all";
+    } else {
+        incomeBtn.className = "flex-1 py-2 rounded-lg bg-green-500 text-white font-semibold transition-all";
+        expenseBtn.className = "flex-1 py-2 rounded-lg text-gray-500 dark:text-gray-400 font-semibold transition-all";
+    }
+}
 
-// Add Transaction
-addBtnModal.addEventListener("click", () => {
-    const category = categorySelectModal.value;
-    const amount = parseFloat(amountInputModal.value);
-    const date = dateInputModal.value;
-
-    if (category === "Select" || !amount || amount <= 0 || !date) {
-        alert("Please fill all fields correctly.");
+/* ➕ ADD TRANSACTION */
+form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!categoryInput.value || !amountInput.value || !dateInput.value) {
+        alert("Please fill all fields");
         return;
     }
 
-    expenses.push({ id: Date.now(), category, amount, date });
-    saveAndRender();
+    const amount = transactionType === "expense" ? -Math.abs(amountInput.value) : Math.abs(amountInput.value);
 
-    // Reset
-    categorySelectModal.value = "Select";
-    amountInputModal.value = "";
-    dateInputModal.value = "";
-
-    // Close modal
-    modal.classList.add("hidden");
-});
-
-// Render Expenses
-function renderExpenses() {
-    tableBody.innerHTML = "";
-    let total = 0;
-
-    expenses.forEach(expense => {
-        total += expense.amount;
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td class="td">${expense.category}</td>
-            <td class="td">₱${expense.amount.toFixed(2)}</td>
-            <td class="td">${expense.date}</td>
-            <td class="td">
-                <button class="delete-btn" onclick="deleteExpense(${expense.id})">✕</button>
-            </td>
-        `;
-        tableBody.appendChild(row);
+    transactions.push({
+        id: Date.now(),
+        category: categoryInput.value,
+        amount: +amount,
+        date: dateInput.value,
     });
 
-    totalAmountEl.textContent = `₱${total.toFixed(2)}`;
-}
-
-// Delete Expense
-function deleteExpense(id) {
-    expenses = expenses.filter(exp => exp.id !== id);
     saveAndRender();
-}
-
-// Save & Render
-function saveAndRender() {
-    localStorage.setItem("expenses", JSON.stringify(expenses));
-    renderExpenses();
-}
-
-// Initial render
-renderExpenses();
-
-// Dark / Light Mode Toggle
-const themeToggleBtn = document.getElementById('theme-toggle');
-const savedTheme = localStorage.getItem('theme');
-
-if (savedTheme === 'dark') {
-    document.documentElement.classList.add('dark');
-    themeToggleBtn.innerHTML = '<i class="fas fa-moon text-orange-500"></i>';
-}
-
-themeToggleBtn.addEventListener('click', () => {
-    if (document.documentElement.classList.contains('dark')) {
-        document.documentElement.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-        themeToggleBtn.innerHTML = '<i class="fas fa-sun text-orange-500"></i>';
-    } else {
-        document.documentElement.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-        themeToggleBtn.innerHTML = '<i class="fas fa-moon text-orange-500"></i>';
-    }
+    form.reset();
 });
+
+/* 🔁 RENDER */
+function render() {
+    list.innerHTML = "";
+    if (transactions.length === 0) {
+        list.innerHTML = `<p class="text-center text-gray-400 py-8">No transactions yet.</p>`;
+        updateTotals();
+        return;
+    }
+
+    transactions.forEach(t => {
+        const isExpense = t.amount < 0;
+        const colorClass = isExpense ? "border-red-500" : "border-green-500";
+        const textClass = isExpense ? "text-red-500" : "text-green-500";
+
+        const li = document.createElement("li");
+        li.className = `flex justify-between items-center bg-gray-50 dark:bg-gray-900/50 p-4 border-l-4 ${colorClass} rounded-2xl transition-all`;
+
+        li.innerHTML = `
+            <div class="flex flex-col">
+                <span class="font-bold dark:text-white text-gray-800">${t.category}</span>
+                <small class="text-gray-400">${t.date}</small>
+            </div>
+            <span class="font-bold text-lg ${textClass}">${isExpense ? '-' : '+'}₱${Math.abs(t.amount).toFixed(2)}</span>
+        `;
+        list.appendChild(li);
+    });
+
+    updateTotals();
+}
+
+function updateTotals() {
+    const amounts = transactions.map(t => t.amount);
+    const total = amounts.reduce((a, b) => a + b, 0);
+    const income = amounts.filter(a => a > 0).reduce((a, b) => a + b, 0);
+    const expense = amounts.filter(a => a < 0).reduce((a, b) => a + b, 0);
+
+    balanceEl.textContent = `₱${total.toFixed(2)}`;
+    incomeEl.textContent = `+₱${income.toFixed(2)}`;
+    expenseEl.textContent = `-₱${Math.abs(expense).toFixed(2)}`;
+}
+
+function saveAndRender() {
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+    render();
+}
+
+/* 🌙 THEME LOGIC FIXED */
+const toggle = document.getElementById("theme-toggle");
+const icon = toggle.querySelector("i");
+
+function updateThemeUI(isDark) {
+    if (isDark) {
+        document.documentElement.classList.add("dark");
+        icon.className = "fas fa-moon text-blue-400";
+    } else {
+        document.documentElement.classList.remove("dark");
+        icon.className = "fas fa-sun text-orange-500";
+    }
+}
+
+// Init theme
+const savedTheme = localStorage.getItem("theme") || "light";
+updateThemeUI(savedTheme === "dark");
+
+toggle.addEventListener("click", () => {
+    const isNowDark = !document.documentElement.classList.contains("dark");
+    localStorage.setItem("theme", isNowDark ? "dark" : "light");
+    updateThemeUI(isNowDark);
+});
+
+render();

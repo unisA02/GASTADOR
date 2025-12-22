@@ -2,91 +2,99 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Expense Tracker App</title>
-
-    <!-- Tailwind CDN -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Gastador</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Custom Styles -->
     <link rel="stylesheet" href="style.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
 </head>
-<body class="bg-orange-50 min-h-screen flex items-center justify-center p-4">
 
-    <!-- Dark/Light Mode Toggle -->
-    <button id="theme-toggle" class="p-2 rounded-full hover:bg-orange-100 fixed top-4 right-4 z-50">
+<body class="bg-orange-50 dark:bg-neutral-900 transition-colors duration-300 min-h-screen p-4 md:p-8">
+
+    <button id="theme-toggle" class="fixed top-6 right-6 z-50 p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700">
         <i class="fas fa-sun text-orange-500"></i>
     </button>
 
-    <div class="bg-white w-full max-w-3xl rounded-xl shadow-lg p-6 space-y-6">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-8">
+        
+        <aside class="w-full md:w-80 lg:w-96 bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-xl h-fit sticky top-8">
+            <h2 class="text-xl font-bold mb-6 text-gray-800 dark:text-white flex items-center gap-2">
+                <i class="fas fa-wallet text-orange-500"></i> Add Transaction
+            </h2>
 
-        <h1 class="text-3xl font-bold text-orange-600 text-center">
-            Expense Tracker App
-        </h1>
-
-        <!-- Add Transaction Button -->
-        <div class="text-center">
-            <button id="open-modal-btn" class="bg-orange-600 text-white py-2 px-4 rounded-md hover:bg-orange-700 transition-all">
-                Add Transaction
-            </button>
-        </div>
-
-        <!-- Expense Table -->
-        <div class="overflow-x-auto">
-            <table class="w-full border border-gray-200 rounded-lg overflow-hidden">
-                <thead class="bg-orange-100">
-                    <tr>
-                        <th class="th">Category</th>
-                        <th class="th">Amount</th>
-                        <th class="th">Date</th>
-                        <th class="th">Delete</th>
-                    </tr>
-                </thead>
-                <tbody id="expense-table-body" class="text-center"></tbody>
-                <tfoot class="bg-orange-50 font-semibold">
-                    <tr>
-                        <td class="td">Total</td>
-                        <td id="total-amount" class="td text-orange-600"></td>
-                        <td class="td"></td>
-                        <td class="td"></td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-    </div>
-
-    <!-- Modal -->
-    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 space-y-4 relative">
-            <h2 class="text-xl font-bold text-orange-600 text-center">Add Transaction</h2>
-
-            <!-- Modal Inputs -->
-            <div class="grid grid-cols-1 gap-4">
-                <select id="modal-category-select" class="input border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500">
-                    <option value="Select">Select Category</option>
-                    <option>Travel</option>
-                    <option>Laundry</option>
-                    <option>Daily Meals</option>
-                    <option>Groceries</option>
-                    <option>Academic</option>
-                    <option>Rent & Utilities</option>
-                    <option>Gym</option>
-                </select>
-
-                <input type="number" id="modal-amount-input" placeholder="Amount" class="input border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500" />
-                <input type="date" id="modal-date-input" class="input border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500" />
-
-                <button id="modal-add-btn" class="bg-orange-600 text-white py-2 px-4 rounded-md hover:bg-orange-700 transition-all w-full">
-                    Add
+            <div class="flex mb-6 rounded-xl overflow-hidden p-1 bg-gray-100 dark:bg-gray-700">
+                <button id="type-expense" class="flex-1 py-2 rounded-lg transition-all duration-200 bg-red-500 text-white font-semibold">
+                    Expense
+                </button>
+                <button id="type-income" class="flex-1 py-2 rounded-lg transition-all duration-200 text-gray-600 dark:text-gray-300">
+                    Income
                 </button>
             </div>
 
-            <!-- Close Button -->
-            <button id="close-modal-btn" class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-lg font-bold">
-                ✕
-            </button>
-        </div>
+            <form id="transaction-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-500 mb-1 ml-1">Category</label>
+                    <select id="category" class="w-full p-3 border-none ring-1 ring-gray-200 dark:ring-gray-700 rounded-xl dark:bg-gray-900 dark:text-white focus:ring-2 focus:ring-orange-500 outline-none">
+                        <option value="">Select Category</option>
+                        <option value="Food">🍔 Food</option>
+                        <option value="Transport">🚗 Transport</option>
+                        <option value="Bills">💡 Bills</option>
+                        <option value="Shopping">🛍 Shopping</option>
+                        <option value="Salary">💼 Salary</option>
+                        <option value="Others">📦 Others</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-500 mb-1 ml-1">Amount</label>
+                    <input type="number" id="amount" placeholder="0.00" class="w-full p-3 border-none ring-1 ring-gray-200 dark:ring-gray-700 rounded-xl dark:bg-gray-900 dark:text-white focus:ring-2 focus:ring-orange-500 outline-none" />
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-500 mb-1 ml-1">Date</label>
+                    <input type="date" id="date" class="w-full p-3 border-none ring-1 ring-gray-200 dark:ring-gray-700 rounded-xl dark:bg-gray-900 dark:text-white focus:ring-2 focus:ring-orange-500 outline-none" />
+                </div>
+
+                <button type="submit" class="w-full bg-orange-500 text-white py-4 rounded-xl font-bold shadow-lg shadow-orange-200 dark:shadow-none hover:bg-orange-600 transform hover:-translate-y-1 transition">
+                    + Add Transaction
+                </button>
+            </form>
+        </aside>
+
+        <main class="flex-1">
+            <header class="mb-8">
+                <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white">
+                    Gastador<span class="text-orange-600">.</span>
+                </h1>
+                <p class="text-gray-500 dark:text-gray-400">Manage your budget effectively</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Total Balance</p>
+                    <h2 id="balance" class="text-3xl font-bold dark:text-white">₱0.00</h2>
+                </div>
+                <div class="bg-green-50 dark:bg-green-900/20 p-6 rounded-3xl shadow-sm border border-green-100 dark:border-green-900/30">
+                    <p class="text-sm text-green-600 dark:text-green-400 font-medium">Income</p>
+                    <h2 id="income" class="text-3xl font-bold text-green-600 dark:text-green-400">+₱0.00</h2>
+                </div>
+                <div class="bg-red-50 dark:bg-red-900/20 p-6 rounded-3xl shadow-sm border border-red-100 dark:border-red-900/30">
+                    <p class="text-sm text-red-600 dark:text-red-400 font-medium">Expenses</p>
+                    <h2 id="expense" class="text-3xl font-bold text-red-600 dark:text-red-400">-₱0.00</h2>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm p-6 border border-gray-100 dark:border-gray-700">
+                <h3 class="text-lg font-bold mb-4 dark:text-white">Transaction History</h3>
+                <ul id="list" class="space-y-4">
+                    </ul>
+            </div>
+        </main>
     </div>
 
     <script src="script.js"></script>
