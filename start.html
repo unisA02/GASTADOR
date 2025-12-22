@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Gastador</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        // Check for saved dark mode preference immediately to prevent flicker
+        tailwind.config = { darkMode: 'class' };
+        if (localStorage.getItem("theme") === "dark") {
+            document.documentElement.classList.add("dark");
+        }
+    </script>
+</head>
+<body class="bg-orange-50 dark:bg-neutral-900 transition-colors duration-300 min-h-screen flex flex-col items-center justify-center p-4">
+
+    <button id="theme-toggle" class="fixed top-6 right-6 z-50 p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 transition-all active:scale-95">
+        <i id="theme-icon" class="fas fa-sun text-orange-500"></i>
+    </button>
+
+    <header class="text-center mb-8">
+        <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white">
+            Gastador<span class="text-orange-600">.</span>
+        </h1>
+        <p class="text-gray-500 dark:text-gray-400 mt-2">Your Trusty Budget Tracker Buddy Whenever You're Busy!</p>
+    </header>
+
+    <main class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-[2.5rem] shadow-xl p-8 md:p-12 text-center border border-white dark:border-gray-700">
+        
+        <div class="bg-orange-100 dark:bg-orange-900/30 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-wallet text-orange-600 text-3xl"></i>
+        </div>
+
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Welcome, Gastador!</h2>
+        <p class="text-gray-400 dark:text-gray-500 mb-8 text-sm md:text-base">Set your monthly budget to start tracking your expenses</p>
+
+        <form id="setup-form" class="text-left space-y-6">
+            <div>
+                <label for="monthly-budget" class="block text-xs font-semibold uppercase text-gray-500 mb-2 ml-1">
+                    Monthly Budget (₱)
+                </label>
+                <input 
+                    type="number" 
+                    id="monthly-budget" 
+                    required
+                    placeholder="e.g., 5000" 
+                    class="w-full bg-gray-50 dark:bg-gray-900 border-none ring-1 ring-gray-200 dark:ring-gray-700 rounded-2xl p-4 text-gray-800 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-orange-500 outline-none transition-all"
+                >
+                <p class="text-gray-400 dark:text-gray-500 text-xs mt-3 ml-1">
+                    Typical student budget: ₱3,000 - ₱10,000/month
+                </p>
+            </div>
+
+            <button 
+                type="submit" 
+                class="w-full bg-orange-500 text-white font-bold py-4 rounded-2xl hover:bg-orange-600 transition-all shadow-lg shadow-orange-200 dark:shadow-none transform hover:-translate-y-1"
+            >
+                Set Budget & Start Tracking
+            </button>
+        </form>
+    </main>
+
+    <footer class="mt-12 flex items-center gap-2 text-gray-500 dark:text-gray-400 text-xs md:text-sm max-w-md text-center">
+        <i class="fas fa-lightbulb text-orange-400"></i>
+        <p>Tip: Don't forget to track your expenses daily frrrr!!!</p>
+    </footer>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        // Function to update icon
+        function updateIcon(isDark) {
+            themeIcon.className = isDark ? "fas fa-moon text-blue-400" : "fas fa-sun text-orange-500";
+        }
+
+        // Initialize icon state
+        updateIcon(document.documentElement.classList.contains('dark'));
+
+        // Theme toggle logic
+        themeToggle.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateIcon(isDark);
+        });
+
+        // Form submission logic
+        const form = document.getElementById('setup-form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const budget = document.getElementById('monthly-budget').value;
+            localStorage.setItem('monthlyBudget', budget);
+            // Redirection logic
+            window.location.href = 'index.html'; 
+        });
+    </script>
+</body>
+</html>

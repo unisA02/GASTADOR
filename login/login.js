@@ -21,7 +21,7 @@ document
     }
 
     localStorage.setItem("user", JSON.stringify(parsedUser));
-    window.location.href = "../index.html";
+    window.location.href = "../start.html";
   });
 
   

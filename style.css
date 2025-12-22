@@ -1,27 +1,28 @@
-/* Custom Scrollbar for better UX */
-::-webkit-scrollbar {
-    width: 8px;
-}
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 10px;
-}
-.dark ::-webkit-scrollbar-thumb {
-    background: #475569;
+/* Placeholder Blur Effect */
+select#category:invalid {
+    color: #9ca3af; /* gray-400 */
 }
 
-/* Smooth transition for theme switching */
-body {
-    transition: background-color 0.3s ease, color 0.3s ease;
+/* Ensure options are visible */
+select#category option {
+    color: #1f2937;
+    background-color: white;
 }
 
-/* Ensure form elements look good in dark mode */
-input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(0);
+.dark select#category option {
+    color: #f9fafb;
+    background-color: #111827;
 }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+.dark ::-webkit-scrollbar-thumb { background: #475569; }
+
+body { transition: background-color 0.3s ease; }
+
+/* Dark mode date picker icon fix */
 .dark input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
 }
