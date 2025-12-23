@@ -1,28 +1,70 @@
-/* Placeholder Blur Effect */
-select#category:invalid {
-    color: #9ca3af; /* gray-400 */
-}
-
-/* Ensure options are visible */
-select#category option {
-    color: #1f2937;
-    background-color: white;
-}
-
-.dark select#category option {
-    color: #f9fafb;
-    background-color: #111827;
+/* Body fix to prevent global scrolling */
+body {
+    height: 100vh;
+    overflow: hidden;
 }
 
 /* Custom Scrollbar */
-::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar { 
+    width: 6px; 
+}
+::-webkit-scrollbar-track { 
+    background: transparent; 
+}
+::-webkit-scrollbar-thumb { 
+    background: #cbd5e1; 
+    border-radius: 10px; 
+}
+.dark ::-webkit-scrollbar-thumb { 
+    background: #475569; 
+}
+
+/* Scrollable Container specific styles */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+/* Dark mode date icon fix */
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+}
+
+/* Form Styles */
+select option {
+    background-color: white;
+    color: #1f2937;
+}
+.dark select option {
+    background-color: #111827; 
+    color: #f9fafb;
+}
+
+.transition-all {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hamburger Menu Slide */
+#side-menu.open { transform: translateX(0); }
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 .dark ::-webkit-scrollbar-thumb { background: #475569; }
 
-body { transition: background-color 0.3s ease; }
+.custom-scrollbar { scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
 
-/* Dark mode date picker icon fix */
-.dark input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-}
+/* Input/Date Logic */
+.dark input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; }
+
+select option { background-color: white; color: #1f2937; }
+.dark select option { background-color: #111827; color: #f9fafb; }
+
+.transition-all { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+

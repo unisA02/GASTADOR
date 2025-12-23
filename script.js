@@ -2,172 +2,190 @@ const form = document.getElementById("transaction-form");
 const list = document.getElementById("list");
 const incomeEl = document.getElementById("income");
 const expenseEl = document.getElementById("expense");
-const categoryInput = document.getElementById("category");
-const amountInput = document.getElementById("amount");
-const dateInput = document.getElementById("date");
-const expenseBtn = document.getElementById("type-expense");
-const incomeBtn = document.getElementById("type-income");
-
-// Budget tracking elements
 const budgetEl = document.getElementById("display-budget");
 const remainingEl = document.getElementById("remaining-budget");
 const remainingCard = document.getElementById("remaining-card");
+const categorySelect = document.getElementById("category");
+const dateInput = document.getElementById("date");
+const amountInput = document.getElementById("amount");
 
 let transactionType = "expense";
+let myChart = null;
 let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-
-// Load Initial Budget from localStorage
 let monthlyBudget = parseFloat(localStorage.getItem("monthlyBudget")) || 0;
+let categories = JSON.parse(localStorage.getItem("categories")) || 
+    ["Travel", "Laundry", "Meals", "Groceries", "Academics", "Rent & utilities", "Gym"];
 
-// 🔄 INITIALIZATION
-document.addEventListener('DOMContentLoaded', () => {
-    // Set default date to today's local date
-    const today = new Date().toLocaleDateString('en-CA'); // Format: YYYY-MM-DD
-    dateInput.value = today;
-
-    // Safety check: if no budget is found, send back to welcome
-    if (monthlyBudget === 0 && transactions.length === 0) {
-        window.location.href = 'welcome.html';
-    }
-
-    render();
-});
-
-/* 🔄 TYPE TOGGLE LOGIC */
-expenseBtn.onclick = () => setType("expense");
-incomeBtn.onclick = () => setType("income");
-
-function setType(type) {
-    transactionType = type;
-    if (type === "expense") {
-        expenseBtn.className = "flex-1 py-2 rounded-lg bg-red-500 text-white font-semibold transition-all";
-        incomeBtn.className = "flex-1 py-2 rounded-lg text-gray-500 dark:text-gray-400 font-semibold transition-all";
-    } else {
-        incomeBtn.className = "flex-1 py-2 rounded-lg bg-green-500 text-white font-semibold transition-all";
-        expenseBtn.className = "flex-1 py-2 rounded-lg text-gray-500 dark:text-gray-400 font-semibold transition-all";
-    }
-}
-
-/* ➕ ADD TRANSACTION */
-form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    
-    const val = parseFloat(amountInput.value);
-    if (!categoryInput.value || isNaN(val) || val <= 0 || !dateInput.value) {
-        alert("Please provide a valid category, amount, and date.");
-        return;
-    }
-
-    // Force negative for expenses, positive for income
-    const amount = transactionType === "expense" ? -Math.abs(val) : Math.abs(val);
-
-    const newTransaction = {
-        id: Date.now(),
-        category: categoryInput.value,
-        amount: amount,
-        date: dateInput.value,
-    };
-
-    transactions.push(newTransaction);
-    saveAndRender();
-    
-    // Reset inputs but keep the current date
-    form.reset();
-    dateInput.value = new Date().toLocaleDateString('en-CA');
-});
-
-/* 🗑 DELETE TRANSACTION */
-function deleteTransaction(id) {
-    if(confirm("Delete this transaction?")) {
-        transactions = transactions.filter(t => t.id !== id);
-        saveAndRender();
-    }
-}
-
-/* 🔁 RENDER UI */
-function render() {
-    list.innerHTML = "";
-    
-    if (transactions.length === 0) {
-        list.innerHTML = `<p class="text-center text-gray-400 py-8 italic">No transactions recorded yet.</p>`;
-        updateTotals();
-        return;
-    }
-
-    // Sort: Newest date first
-    const sortedTransactions = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
-
-    sortedTransactions.forEach(t => {
-        const isExpense = t.amount < 0;
-        const colorClass = isExpense ? "border-red-500" : "border-green-500";
-        const textClass = isExpense ? "text-red-500" : "text-green-600 dark:text-green-400";
-
-        const li = document.createElement("li");
-        li.className = `group flex justify-between items-center bg-gray-50 dark:bg-gray-900/40 p-4 border-l-4 ${colorClass} rounded-2xl transition-all hover:shadow-md`;
-
-        li.innerHTML = `
-            <div class="flex flex-col">
-                <span class="font-bold text-gray-800 dark:text-gray-100">${t.category}</span>
-                <small class="text-gray-500 dark:text-gray-400">${t.date}</small>
-            </div>
-            <div class="flex items-center gap-4">
-                <span class="font-bold text-lg ${textClass}">
-                    ${isExpense ? '-' : '+'}₱${Math.abs(t.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                </span>
-                <button onclick="deleteTransaction(${t.id})" class="text-gray-300 hover:text-red-500 transition-colors p-2">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            </div>
-        `;
-        list.appendChild(li);
+// --- ADDED THIS HELPER FUNCTION TO FIX THE ERROR ---
+function formatCurrency(amount) {
+    return "₱" + Math.abs(amount).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
     });
-
-    updateTotals();
 }
 
-/* 📊 CALCULATE TOTALS */
-function updateTotals() {
-    const income = transactions.filter(t => t.amount > 0).reduce((acc, t) => acc + t.amount, 0);
-    const expense = transactions.filter(t => t.amount < 0).reduce((acc, t) => acc + t.amount, 0);
-    const totalSpent = Math.abs(expense);
-    
-    const remaining = monthlyBudget - totalSpent;
-
-    // Update displays
-    budgetEl.textContent = `₱${monthlyBudget.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-    incomeEl.textContent = `+₱${income.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-    expenseEl.textContent = `-₱${totalSpent.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-    remainingEl.textContent = `₱${remaining.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-
-    // Alert UI: Red if budget is exceeded
-    if (remaining < 0) {
-        remainingCard.className = "bg-red-600 p-5 rounded-3xl shadow-sm border border-red-700 text-white transition-all scale-105 md:scale-100";
-        remainingEl.className = "text-2xl font-black text-white";
-    } else {
-        remainingCard.className = "bg-white dark:bg-gray-800 p-5 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all";
-        remainingEl.className = "text-2xl font-black text-indigo-600 dark:text-indigo-400";
-    }
-}
-
-function saveAndRender() {
-    localStorage.setItem("transactions", JSON.stringify(transactions));
+document.addEventListener('DOMContentLoaded', () => {
+    dateInput.value = new Date().toISOString().split('T')[0];
+    updateCategoryUI();
     render();
+});
+
+function updateCategoryUI() {
+    categorySelect.innerHTML = categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
 }
 
-/* 🌙 THEME SWITCHER */
-const themeToggle = document.getElementById("theme-toggle");
-const themeIcon = themeToggle.querySelector("i");
-
-const applyTheme = (isDark) => {
-    document.documentElement.classList.toggle("dark", isDark);
-    themeIcon.className = isDark ? "fas fa-moon text-blue-400" : "fas fa-sun text-orange-500";
+document.getElementById("add-cat-btn").onclick = () => {
+    const val = document.getElementById("new-category").value.trim();
+    if (val && !categories.includes(val)) {
+        categories.push(val);
+        localStorage.setItem("categories", JSON.stringify(categories));
+        updateCategoryUI();
+        document.getElementById("new-category").value = "";
+    }
 };
 
-// Init theme
-applyTheme(localStorage.getItem("theme") === "dark");
+document.getElementById("delete-cat-btn").onclick = () => {
+    if (confirm(`Remove "${categorySelect.value}"?`)) {
+        categories = categories.filter(c => c !== categorySelect.value);
+        localStorage.setItem("categories", JSON.stringify(categories));
+        updateCategoryUI();
+    }
+};
 
-themeToggle.addEventListener("click", () => {
+// Hamburger Menu Logic
+const menuToggle = document.getElementById("menu-toggle");
+const sideMenu = document.getElementById("side-menu");
+const closeMenu = document.getElementById("close-menu");
+const menuBackdrop = document.getElementById("menu-backdrop");
+
+const toggleMenu = () => sideMenu.classList.toggle("open");
+menuToggle.onclick = toggleMenu;
+closeMenu.onclick = toggleMenu;
+menuBackdrop.onclick = toggleMenu;
+
+// Transaction Type Toggling
+const expenseBtn = document.getElementById("type-expense");
+const incomeBtn = document.getElementById("type-income");
+const expenseFields = document.getElementById("expense-fields");
+const incomeFields = document.getElementById("income-fields");
+
+function setMode(mode) {
+    transactionType = mode;
+    const title = document.getElementById("history-title");
+    expenseBtn.className = mode === "expense" ? "flex-1 py-2 rounded-lg bg-red-500 text-white font-semibold" : "flex-1 py-2 rounded-lg text-gray-500 font-semibold";
+    incomeBtn.className = mode === "income" ? "flex-1 py-2 rounded-lg bg-green-500 text-white font-semibold" : "flex-1 py-2 rounded-lg text-gray-500 font-semibold";
+    expenseFields.classList.toggle("hidden", mode !== "expense");
+    incomeFields.classList.toggle("hidden", mode !== "income");
+    title.innerText = mode === "expense" ? "Expense History" : "Income Tracker";
+    render();
+}
+
+expenseBtn.onclick = () => setMode("expense");
+incomeBtn.onclick = () => setMode("income");
+
+function render() {
+    const filtered = transactions.filter(t => t.type === transactionType);
+    list.innerHTML = filtered.length === 0 ? `<p class="text-center text-gray-400 py-10 italic">No ${transactionType} history.</p>` : "";
+    
+    filtered.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(t => {
+        const li = document.createElement("li");
+        li.className = `flex justify-between items-center bg-gray-50 dark:bg-gray-900/40 p-4 border-l-4 ${t.amount < 0 ? 'border-red-500' : 'border-green-500'} rounded-2xl`;
+        li.innerHTML = `<div><p class="font-bold dark:text-white text-sm">${t.category}</p><small class="text-gray-400">${t.date}</small></div>
+                        <div class="flex items-center gap-3"><span class="font-bold text-sm ${t.amount < 0 ? 'text-red-500' : 'text-green-500'}">${formatCurrency(t.amount)}</span>
+                        <button onclick="deleteTransaction(${t.id})" class="text-gray-300 hover:text-red-500"><i class="fas fa-trash-alt text-xs"></i></button></div>`;
+        list.appendChild(li);
+    });
+    updateTotals();
+    updateChart(filtered);
+}
+
+function updateChart(data) {
+    const ctx = document.getElementById('budgetChart').getContext('2d');
+    const totals = {};
+    data.forEach(t => totals[t.category] = (totals[t.category] || 0) + Math.abs(t.amount));
+    
+    const labels = Object.keys(totals);
+    const values = Object.values(totals);
+
+    const expenseShades = ['#ef4444', '#dc2626', '#b91c1c', '#991b1b', '#7f1d1d', '#f87171', '#fca5a5'];
+    const incomeShades = ['#22c55e', '#16a34a', '#15803d', '#166534', '#14532d', '#4ade80', '#86efac'];
+
+    const activeColors = transactionType === "expense" ? expenseShades : incomeShades;
+
+    if (myChart) myChart.destroy();
+    myChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: activeColors.slice(0, labels.length),
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: { 
+            maintainAspectRatio: false,
+            cutout: '85%', 
+            plugins: { 
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => ` ${context.label}: ${formatCurrency(context.raw)}`
+                    }
+                }
+            } 
+        }
+    });
+
+    const legendEl = document.getElementById("chart-legend");
+    legendEl.innerHTML = labels.map((l, i) => `
+        <div class="flex justify-between items-center p-1 border-b border-gray-50 dark:border-gray-700/50 pb-2">
+            <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full" style="background:${activeColors[i % activeColors.length]}"></span>
+                <span class="text-gray-500 dark:text-gray-400 truncate w-24">${l}</span>
+            </div>
+            <span class="font-bold dark:text-white">${formatCurrency(totals[l])}</span>
+        </div>
+    `).join('');
+}
+
+function updateTotals() {
+    const inc = transactions.filter(t => t.amount > 0).reduce((a, t) => a + t.amount, 0);
+    const exp = transactions.filter(t => t.amount < 0).reduce((a, t) => a + t.amount, 0);
+    const rem = monthlyBudget - Math.abs(exp);
+    budgetEl.textContent = formatCurrency(monthlyBudget);
+    incomeEl.textContent = formatCurrency(inc);
+    expenseEl.textContent = formatCurrency(exp);
+    remainingEl.textContent = formatCurrency(rem);
+    remainingCard.className = rem < 0 ? "bg-red-500 p-5 rounded-3xl text-white shadow-lg" : "bg-white dark:bg-gray-800 p-5 rounded-3xl border border-gray-100 dark:border-gray-700";
+}
+
+form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    transactions.push({
+        id: Date.now(),
+        category: transactionType === "expense" ? categorySelect.value : document.getElementById("income-source").value || "Income",
+        amount: transactionType === "expense" ? -Math.abs(amountInput.value) : Math.abs(amountInput.value),
+        date: dateInput.value,
+        type: transactionType
+    });
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+    form.reset();
+    dateInput.value = new Date().toISOString().split('T')[0];
+    render();
+});
+
+window.deleteTransaction = (id) => {
+    transactions = transactions.filter(t => t.id !== id);
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+    render();
+};
+
+const themeToggle = document.getElementById("theme-toggle");
+themeToggle.onclick = () => {
     const isDark = document.documentElement.classList.toggle("dark");
     localStorage.setItem("theme", isDark ? "dark" : "light");
-    applyTheme(isDark);
-});
+    themeToggle.querySelector("i").className = isDark ? "fas fa-moon text-blue-400" : "fas fa-sun text-orange-500";
+};
+if (localStorage.getItem("theme") === "dark") document.documentElement.classList.add("dark");
