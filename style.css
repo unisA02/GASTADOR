@@ -1,70 +1,84 @@
-/* Body fix to prevent global scrolling */
-body {
-    height: 100vh;
-    overflow: hidden;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+
+body { 
+    font-family: 'Inter', sans-serif; 
+    transition: background-color 0.3s ease; 
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar { 
+.nav-btn { 
+    padding: 1rem; 
+    border-radius: 1.25rem; 
+    color: #9ca3af; 
+    transition: all 0.3s ease; 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+}
+
+.nav-btn:hover { 
+    background-color: #fff7ed; 
+    color: #f97316; 
+}
+
+.dark .nav-btn:hover { 
+    background-color: #1f2937; 
+}
+
+.nav-btn.active { 
+    background-color: #f97316; 
+    color: white; 
+    box-shadow: 0 10px 20px rgba(249, 115, 22, 0.3); 
+}
+
+.tab-content { 
+    animation: fadeIn 0.4s ease-out; 
+}
+
+@keyframes fadeIn { 
+    from { opacity: 0; transform: translateY(10px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
+
+.custom-scrollbar::-webkit-scrollbar { 
     width: 6px; 
 }
-::-webkit-scrollbar-track { 
-    background: transparent; 
-}
-::-webkit-scrollbar-thumb { 
-    background: #cbd5e1; 
+
+.custom-scrollbar::-webkit-scrollbar-thumb { 
+    background: #e5e7eb; 
     border-radius: 10px; 
 }
-.dark ::-webkit-scrollbar-thumb { 
-    background: #475569; 
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb { 
+    background: #374151; 
 }
 
-/* Scrollable Container specific styles */
-.custom-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: #cbd5e1 transparent;
+.dark input[type="date"]::-webkit-calendar-picker-indicator { 
+    filter: invert(1); 
 }
 
-/* Dark mode date icon fix */
-.dark input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
+input[type="number"]::-webkit-inner-spin-button { 
+    display: none; 
 }
 
-input[type="date"]::-webkit-calendar-picker-indicator {
-    cursor: pointer;
+.animate-in { 
+    animation-fill-mode: forwards; 
 }
 
-/* Form Styles */
-select option {
-    background-color: white;
-    color: #1f2937;
-}
-.dark select option {
-    background-color: #111827; 
-    color: #f9fafb;
+canvas { 
+    max-width: 100% !important; 
 }
 
-.transition-all {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* Modal and transition refinements */
+#fund-modal, #fund-op-modal {
+    transition: opacity 0.3s ease;
 }
 
-/* Hamburger Menu Slide */
-#side-menu.open { transform: translateX(0); }
+.zoom-in-95 {
+    animation: zoomIn 0.2s ease-out;
+}
 
-/* Scrollbars */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-.dark ::-webkit-scrollbar-thumb { background: #475569; }
-
-.custom-scrollbar { scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
-
-/* Input/Date Logic */
-.dark input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
-input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; }
-
-select option { background-color: white; color: #1f2937; }
-.dark select option { background-color: #111827; color: #f9fafb; }
-
-.transition-all { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-
+@keyframes zoomIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}

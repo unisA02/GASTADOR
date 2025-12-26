@@ -1,151 +1,362 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Gastador - Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gastador - Finance Tracker</title>
+    <script>
+        // Theme management
+        const theme = localStorage.getItem('theme');
+        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+        
+        // Auth check
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'login.html';
+        } else if (!localStorage.getItem('monthlyBudget')) {
+            window.location.href = 'start.html';
+        }
+
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = 'login.html';
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        orange: { 500: '#f97316' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
-    <script>tailwind.config = { darkMode: 'class' }</script>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "recharts": "https://esm.sh/recharts@^3.6.0"
+  }
+}
+</script>
 </head>
-<body class="bg-orange-50 dark:bg-neutral-900 transition-colors duration-300 h-screen overflow-hidden p-4 md:p-8">
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased overflow-hidden">
 
-    <button id="menu-toggle" class="fixed top-6 left-6 z-50 p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 active:scale-95 transition-all">
-        <i class="fas fa-bars text-orange-500"></i>
-    </button>
+<div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <nav class="w-20 flex flex-col items-center py-8 gap-6 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 z-50">
+        <div class="mb-4 text-orange-500 text-3xl font-black">G.</div>
 
-    <button id="theme-toggle" class="fixed top-6 right-6 z-50 p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 active:scale-95 transition-transform">
-        <i class="fas fa-sun text-orange-500"></i>
-    </button>
-
-    <div id="side-menu" class="fixed inset-0 z-[60] transform -translate-x-full transition-transform duration-300 ease-in-out">
-        <div id="menu-backdrop" class="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
-        <div class="relative w-72 h-full bg-white dark:bg-gray-900 shadow-2xl p-8 flex flex-col">
-            <div class="flex justify-between items-center mb-10">
-                <h2 class="text-2xl font-black text-gray-900 dark:text-white">Menu<span class="text-orange-600">.</span></h2>
-                <button id="close-menu" class="text-gray-400 hover:text-orange-500"><i class="fas fa-times text-xl"></i></button>
-            </div>
-            <nav class="space-y-6 flex-1">
-                <a href="index.html" class="flex items-center gap-4 text-orange-500 font-bold text-lg">
-                    <i class="fas fa-home w-6"></i> Home
-                </a>
-                <a href="about.html" class="flex items-center gap-4 text-gray-500 dark:text-gray-400 font-semibold text-lg hover:text-orange-500 transition-colors">
-                    <i class="fas fa-info-circle w-6"></i> About
-                </a>
-            </nav>
-            <div class="pt-6 border-t border-gray-100 dark:border-gray-800">
-                <button type="button" onclick="location.href='start.html'" class="w-full bg-orange-50 dark:bg-gray-800 text-orange-700 dark:text-orange-400 py-4 rounded-2xl font-bold border border-orange-100 dark:border-gray-700 hover:bg-orange-100 transition-all flex items-center justify-center gap-3">
-                    <i class="fas fa-redo-alt text-xs"></i> Reset Allotted Budget
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div class="max-w-7xl mx-auto h-full flex flex-col md:flex-row gap-8">
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn active" title="Dashboard"><i class="fas fa-th-large"></i></button>
+        <button onclick="switchTab('emergency')" id="nav-emergency" class="nav-btn" title="Emergency Fund"><i class="fas fa-shield-alt"></i></button>
+        <button onclick="switchTab('sinking')" id="nav-sinking" class="nav-btn" title="Sinking Funds"><i class="fas fa-piggy-bank"></i></button>
+        <button onclick="switchTab('assets')" id="nav-assets" class="nav-btn" title="Assets & Net Worth"><i class="fas fa-chart-line"></i></button>
+        <button onclick="switchTab('banks')" id="nav-banks" class="nav-btn" title="Digital Banks"><i class="fas fa-university"></i></button>
+        <button onclick="switchTab('growth')" id="nav-growth" class="nav-btn" title="Reports"><i class="fas fa-seedling"></i></button>
         
-        <div class="w-full md:w-80 lg:w-96 flex flex-col gap-4 h-full">
-            <aside class="bg-white dark:bg-gray-800 p-6 rounded-[2.5rem] shadow-xl border border-white dark:border-gray-700 flex-shrink-0">
-                <h2 class="text-xl font-bold mb-6 dark:text-white flex items-center gap-2">
-                    <i class="fas fa-wallet text-orange-500"></i> Add Transaction
-                </h2>
+        <a href="about.html" class="nav-btn" title="About Gastador"><i class="fas fa-info-circle"></i></a>
 
-                <form id="transaction-form" class="space-y-4">
-                    <div class="flex mb-6 rounded-xl overflow-hidden p-1 bg-gray-100 dark:bg-gray-700">
-                        <button type="button" id="type-expense" class="flex-1 py-2 rounded-lg transition-all bg-red-500 text-white font-semibold">Expense</button>
-                        <button type="button" id="type-income" class="flex-1 py-2 rounded-lg transition-all text-gray-500 dark:text-gray-400 font-semibold">Income</button>
-                    </div>
-                    
-                    <div id="expense-fields" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-semibold uppercase text-gray-500 mb-1 ml-1 tracking-tight">Category</label>
-                            <div class="flex gap-2">
-                                <select id="category" class="flex-1 p-3 bg-gray-50 dark:bg-gray-900 border-none ring-1 ring-gray-200 dark:ring-gray-700 rounded-xl dark:text-white focus:ring-2 focus:ring-orange-500 outline-none cursor-pointer transition-all"></select>
-                                <button type="button" id="delete-cat-btn" class="p-3 text-gray-400 hover:text-red-500"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </div>
-                        <div class="flex gap-2">
-                            <input type="text" id="new-category" placeholder="Add custom..." class="flex-1 p-3 text-sm bg-gray-50 dark:bg-gray-900 ring-1 ring-gray-200 dark:ring-gray-700 rounded-xl dark:text-white outline-none focus:ring-2 focus:ring-orange-500 transition-all">
-                            <button type="button" id="add-cat-btn" class="bg-gray-100 dark:bg-gray-700 px-4 rounded-xl text-gray-600 dark:text-white font-bold hover:bg-orange-500 hover:text-white transition-all">Add</button>
-                        </div>
-                    </div>
-
-                    <div id="income-fields" class="hidden space-y-4">
-                        <div>
-                            <label class="block text-xs font-semibold uppercase text-gray-500 mb-1 ml-1 tracking-tight">Source Description</label>
-                            <input type="text" id="income-source" placeholder="e.g. Salary, Freelance" class="w-full p-3 bg-gray-50 dark:bg-gray-900 ring-1 ring-gray-200 dark:ring-gray-700 rounded-xl dark:text-white focus:ring-2 focus:ring-orange-500 outline-none transition-all">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold uppercase text-gray-500 mb-1 ml-1 tracking-tight">Frequency</label>
-                            <select id="frequency" class="w-full p-3 bg-gray-50 dark:bg-gray-900 ring-1 ring-gray-200 dark:ring-gray-700 rounded-xl dark:text-white focus:ring-2 focus:ring-orange-500 outline-none cursor-pointer transition-all">
-                                <option value="One-time">One-time</option>
-                                <option value="Weekly">Weekly</option>
-                                <option value="Monthly">Monthly</option>
-                                <option value="Yearly">Yearly</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-gray-500 mb-1 ml-1 tracking-tight">Amount (₱)</label>
-                        <input type="number" id="amount" placeholder="0.00" step="0.01" required class="w-full p-3 bg-gray-50 dark:bg-gray-900 ring-1 ring-gray-200 dark:ring-gray-700 rounded-xl dark:text-white focus:ring-2 focus:ring-orange-500 outline-none transition-all">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-gray-500 mb-1 ml-1 tracking-tight">Date</label>
-                        <input type="date" id="date" required class="w-full p-3 bg-gray-50 dark:bg-gray-900 ring-1 ring-gray-200 dark:ring-gray-700 rounded-xl dark:text-white focus:ring-2 focus:ring-orange-500 outline-none cursor-pointer transition-all">
-                    </div>
-
-                    <button type="submit" class="w-full bg-orange-500 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-orange-600 transform hover:-translate-y-1 transition-all active:scale-95">
-                        + Add Transaction
-                    </button>
-                </form>
-            </aside>
+        <div class="mt-auto">
+            <button id="theme-toggle" class="p-3 text-gray-400 hover:text-orange-500 transition-colors">
+                <i class="fas fa-moon"></i>
+            </button>
         </div>
+    </nav>
 
-        <main class="flex-1 flex flex-col h-full overflow-hidden">
-            <header class="mb-6 flex-shrink-0 ml-12 md:ml-0">
-                <h1 class="text-3xl font-black text-gray-900 dark:text-white">Gastador<span class="text-orange-600">.</span></h1>
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content space-y-8">
+            <header class="flex flex-col sm:flex-row justify-between sm:items-end gap-4">
+                <div>
+                    <h1 class="text-4xl font-black tracking-tight">Gastador<span class="text-orange-500">.</span></h1>
+                    <p class="text-gray-400 text-sm font-medium">Hello, <span id="user-display-name">Gastador</span>!</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="window.location.href='start.html'" class="bg-white dark:bg-gray-900 px-5 py-3 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 flex items-center gap-3 hover:bg-orange-50 dark:hover:bg-gray-800 transition-all group active:scale-95">
+                        <i class="fas fa-sync-alt text-orange-500 group-hover:rotate-180 transition-transform duration-500 text-xs"></i>
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Reset Budget</span>
+                    </button>
+                    <button onclick="logout()" class="bg-white dark:bg-gray-900 px-5 py-3 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 flex items-center gap-3 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all group active:scale-95 text-red-500">
+                        <i class="fas fa-sign-out-alt text-xs"></i>
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Logout</span>
+                    </button>
+                </div>
             </header>
 
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 flex-shrink-0">
-                <div class="bg-white dark:bg-gray-800 p-5 rounded-3xl border border-gray-100 dark:border-gray-700">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Budget</p>
-                    <h2 id="display-budget" class="text-xl font-black text-indigo-500">₱0.00</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white dark:bg-gray-900 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800">
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Monthly Limit</p>
+                    <h2 id="display-budget" class="text-2xl font-black text-blue-600">₱0.00</h2>
                 </div>
-                <div id="remaining-card" class="bg-white dark:bg-gray-800 p-5 rounded-3xl border border-gray-100 dark:border-gray-700">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Remaining</p>
-                    <h2 id="remaining-budget" class="text-xl font-black dark:text-white">₱0.00</h2>
+                <div class="bg-white dark:bg-gray-900 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800">
+                    <div class="flex justify-between items-center mb-1">
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest tracking-tighter">Guilt-Free Left</p>
+                        <span id="budget-status"></span>
+                    </div>
+                    <h2 id="remaining-budget" class="text-2xl font-black">₱0.00</h2>
+                    <div class="w-full bg-gray-100 dark:bg-gray-800 h-2 mt-3 rounded-full overflow-hidden">
+                        <div id="budget-progress-bar" class="h-full bg-green-500 transition-all duration-700"></div>
+                    </div>
                 </div>
-                <div class="bg-green-50 dark:bg-green-900/10 p-5 rounded-3xl border border-green-100 dark:border-green-900/20">
-                    <p class="text-[10px] text-green-500 font-bold uppercase tracking-widest">Total Income</p>
-                    <h2 id="income" class="text-xl font-black text-green-500">₱0.00</h2>
+                <div class="bg-white dark:bg-gray-900 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800">
+                    <p class="text-[10px] font-black text-green-500 uppercase tracking-widest">Inflow</p>
+                    <h2 id="income" class="text-2xl font-black text-green-500">₱0.00</h2>
                 </div>
-                <div class="bg-red-50 dark:bg-red-900/10 p-5 rounded-3xl border border-red-100 dark:border-red-900/20">
-                    <p class="text-[10px] text-red-500 font-bold uppercase tracking-widest">Total Expenses</p>
-                    <h2 id="expense" class="text-xl font-black text-red-500">₱0.00</h2>
+                <div class="bg-white dark:bg-gray-900 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800">
+                    <p class="text-[10px] font-black text-red-500 uppercase tracking-widest">Outflow</p>
+                    <h2 id="expense" class="text-2xl font-black text-red-500">₱0.00</h2>
                 </div>
             </div>
 
-            <div class="flex flex-col lg:flex-row gap-6 flex-1 min-h-0 mb-4">
-                <div class="flex-1 bg-white dark:bg-gray-800 rounded-[2.5rem] p-6 border border-gray-100 dark:border-gray-700 flex flex-col">
-                    <h3 id="history-title" class="text-lg font-bold mb-4 dark:text-white">Expense History</h3>
-                    <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-                        <ul id="list" class="space-y-3"></ul>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Add Entry -->
+                <div class="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-800 space-y-6">
+                    <h3 class="font-black flex items-center gap-2"><i class="fas fa-wallet text-orange-500"></i> New Entry</h3>
+                    <div class="flex bg-gray-50 dark:bg-gray-800 p-1 rounded-2xl">
+                        <button id="type-expense" class="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold text-sm shadow-md transition-all">Expense</button>
+                        <button id="type-income" class="flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm transition-all">Income</button>
                     </div>
+                    <form id="transaction-form" class="space-y-4">
+                        <div id="expense-fields" class="space-y-4">
+                            <select id="category" class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none ring-1 ring-gray-100 dark:ring-gray-700 focus:ring-orange-500 transition-all"></select>
+                            <div class="flex gap-2">
+                                <input type="text" id="new-category" placeholder="Custom category..." class="flex-1 p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none ring-1 ring-gray-100 dark:ring-gray-700 text-sm">
+                                <button type="button" id="add-cat-btn" class="px-5 bg-orange-500 text-white font-black rounded-2xl text-xs uppercase shadow-lg shadow-orange-500/20">Add</button>
+                            </div>
+                        </div>
+                        <div id="income-fields" class="hidden">
+                            <input type="text" id="income-source" placeholder="Source (e.g. Allowance)" class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none ring-1 ring-gray-100 dark:ring-gray-700">
+                        </div>
+                        <input type="number" id="amount" placeholder="Amount (₱)" class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none ring-1 ring-gray-100 dark:ring-gray-700 font-bold text-xl" required>
+                        <input type="date" id="date" class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none ring-1 ring-gray-100 dark:ring-gray-700 text-sm" required>
+                        <button type="submit" id="save-entry-btn" class="w-full py-5 bg-orange-500 text-white rounded-[2rem] font-black shadow-xl shadow-orange-500/20 hover:scale-[1.02] active:scale-95 transition-all">+ Save Expense</button>
+                    </form>
                 </div>
 
-                <div class="w-full lg:w-72 bg-white dark:bg-gray-800 rounded-[2.5rem] p-6 border border-gray-100 dark:border-gray-700 flex flex-col items-center">
-                    <h3 class="text-[10px] font-bold mb-6 text-gray-400 uppercase tracking-[0.2em]">Visual Overview</h3>
-                    <div class="relative w-full h-40">
-                        <canvas id="budgetChart"></canvas>
+                <div class="lg:col-span-2 space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- History -->
+                        <div class="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col min-h-[400px]">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 id="history-title" class="font-black">Expense History</h3>
+                                <button id="clear-filter" class="hidden text-[10px] font-black text-orange-500 uppercase tracking-widest">Clear Filter</button>
+                            </div>
+                            <ul id="list" class="space-y-3 flex-1 overflow-y-auto pr-2 custom-scrollbar"></ul>
+                        </div>
+                        <!-- Pie Chart -->
+                        <div class="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col items-center justify-between">
+                            <h3 id="chart-title" class="font-black self-start">Spending Mix</h3>
+                            <div class="relative h-56 w-56 my-6">
+                                <canvas id="budgetChart"></canvas>
+                            </div>
+                            <div id="chart-legend" class="w-full space-y-2 text-xs"></div>
+                        </div>
                     </div>
-                    <div id="chart-legend" class="mt-6 w-full h-40 overflow-y-auto custom-scrollbar space-y-2 text-[11px]"></div>
                 </div>
             </div>
-        </main>
+        </div>
+
+        <!-- Emergency Fund -->
+        <div id="emergency" class="tab-content hidden max-w-2xl mx-auto space-y-8">
+            <div class="flex items-center gap-4">
+                <div class="p-4 bg-blue-500 text-white rounded-3xl shadow-xl shadow-blue-500/20"><i class="fas fa-shield-alt text-2xl"></i></div>
+                <div><h2 class="text-3xl font-black">Emergency Fund</h2><p class="text-gray-400 text-sm font-medium">Your financial safety net</p></div>
+            </div>
+            
+            <div id="ef-setup-view" class="bg-white dark:bg-gray-900 p-10 rounded-[3rem] shadow-sm border border-gray-100 dark:border-gray-800 space-y-8 text-center">
+                <i class="fas fa-umbrella text-6xl text-blue-100 dark:text-blue-900/20"></i>
+                <div class="space-y-2 text-center">
+                    <h3 class="text-2xl font-black">Build Your Foundation</h3>
+                    <p class="text-gray-500 max-w-sm mx-auto">Experts recommend 3-6 months of expenses for security.</p>
+                </div>
+                <div class="space-y-4 max-w-sm mx-auto text-left">
+                    <label class="text-[10px] font-black uppercase text-gray-400 ml-2">Target amount</label>
+                    <input type="number" id="ef-target-input" class="w-full p-5 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none" placeholder="Target Amount (₱)" required>
+                    <label class="text-[10px] font-black uppercase text-gray-400 ml-2">Monthly contribution</label>
+                    <input type="number" id="ef-monthly-input" class="w-full p-5 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none" placeholder="Monthly Contribution (₱)" required>
+                    <button id="ef-start-btn" class="w-full py-5 bg-black dark:bg-blue-600 text-white rounded-[2rem] font-black shadow-xl hover:scale-[1.02] transition-all">Start Building Foundation</button>
+                </div>
+            </div>
+
+            <div id="ef-tracker-view" class="hidden space-y-8">
+                <div class="bg-blue-50 dark:bg-blue-900/10 p-10 rounded-[3rem] border border-blue-100 dark:border-blue-800/30 text-center">
+                    <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-2">Total Saved</p>
+                    <h3 id="ef-balance-display" class="text-5xl font-black text-blue-600 mb-6">₱0.00</h3>
+                    <div class="w-full bg-gray-200 dark:bg-gray-800 h-3 rounded-full overflow-hidden mb-4">
+                        <div id="ef-progress-bar" class="h-full bg-blue-500 transition-all duration-1000"></div>
+                    </div>
+                    <div class="flex justify-between text-[10px] font-black uppercase tracking-tighter">
+                        <span id="ef-percent-display">0% funded</span>
+                        <span id="ef-timeline-display"></span>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 space-y-6">
+                    <h4 class="font-black text-lg">Update Balance</h4>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <input type="number" id="ef-deposit-amount" class="flex-1 p-5 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold text-xl" placeholder="Amount ₱" required>
+                        <div class="flex gap-2">
+                           <button id="ef-deposit-btn" class="px-8 bg-green-500 text-white rounded-2xl font-black shadow-xl">Add</button>
+                           <button id="ef-withdraw-btn" class="px-8 bg-red-500 text-white rounded-2xl font-black shadow-xl">Withdraw</button>
+                        </div>
+                    </div>
+                    <div class="flex justify-between">
+                        <button id="ef-edit-btn" class="text-xs font-black text-blue-500 uppercase tracking-widest">Edit Goal</button>
+                        <button id="ef-reset-btn" class="text-xs font-black text-gray-400 uppercase tracking-widest hover:text-red-500">Reset Plan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sinking Funds -->
+        <div id="sinking" class="tab-content hidden space-y-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-3xl font-black">Sinking Funds</h2>
+                    <p class="text-gray-400 text-sm font-medium">"Every peso has a job for a specific goal"</p>
+                </div>
+                <button id="open-fund-modal" class="bg-orange-500 text-white px-8 py-4 rounded-[2rem] font-black shadow-xl shadow-orange-500/20 hover:scale-105 transition-all">+ New Fund</button>
+            </div>
+            <div id="funds-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+
+        <!-- Assets -->
+        <div id="assets" class="tab-content hidden max-w-4xl mx-auto space-y-8">
+            <div class="bg-gradient-to-br from-indigo-600 to-purple-600 p-12 rounded-[3.5rem] text-white shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-8 opacity-10"><i class="fas fa-coins text-9xl"></i></div>
+                <div class="relative z-10">
+                    <p class="text-xs font-black uppercase tracking-[0.2em] opacity-70 mb-2">Total Net Worth</p>
+                    <h3 id="total-net-worth" class="text-5xl font-black mb-4">₱0.00</h3>
+                    <p id="assets-count" class="text-xs font-bold bg-white/20 inline-block px-4 py-2 rounded-full backdrop-blur-md">0 assets tracked</p>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-gray-900 p-10 rounded-[3rem] shadow-sm border border-gray-100 dark:border-gray-800 space-y-6">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-2xl font-black">Track Your Net Worth</h3>
+                    <button id="toggle-asset-form" class="bg-orange-500 text-white px-6 py-2 rounded-xl font-black text-sm uppercase tracking-widest">+ Add Asset</button>
+                </div>
+                <form id="asset-form" class="hidden space-y-4 pb-8 animate-in fade-in">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" id="asset-name" placeholder="Asset Name" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none" required>
+                        <input type="number" id="asset-value" placeholder="Current value ₱" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold" required>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <select id="asset-category" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none">
+                            <option value="Electronics">Electronics</option>
+                            <option value="School">School</option>
+                            <option value="Transportation">Transportation</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="date" id="asset-date" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none text-sm" required>
+                        <div class="flex gap-2">
+                           <button type="submit" class="flex-1 bg-black dark:bg-indigo-600 text-white rounded-2xl font-black">Add</button>
+                           <button type="button" id="cancel-asset-btn" class="px-6 bg-gray-100 dark:bg-gray-700 rounded-2xl font-black">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+                <div id="asset-list-display" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-900 p-10 rounded-[3rem] shadow-sm border border-gray-100 dark:border-gray-800 space-y-6">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-2xl font-black">Liabilities</h3>
+                    <button id="toggle-liability-form" class="text-red-500 font-black text-sm uppercase tracking-widest">+ Add Debt</button>
+                </div>
+                <form id="liability-form" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4 pb-8 border-b border-gray-50 dark:border-gray-800 animate-in fade-in">
+                    <input type="text" id="debt-name" placeholder="Debt Name" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none" required>
+                    <input type="number" id="debt-value" placeholder="Amount ₱" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold" required>
+                    <button type="submit" class="bg-red-500 text-white rounded-2xl font-black">Save Debt</button>
+                </form>
+                <div id="liability-list-display" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+        </div>
+
+        <!-- Banks -->
+        <div id="banks" class="tab-content hidden space-y-8">
+            <div class="flex justify-between items-center">
+                <div><h2 class="text-3xl font-black">Digital Banks</h2><p class="text-gray-400 text-sm font-medium">Monitor your high-yield savings</p></div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <form id="bank-form" class="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-800 space-y-4 h-fit">
+                    <h3 class="font-black">Add Account</h3>
+                    <input type="text" id="bank-name" placeholder="Bank" class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none" required>
+                    <input type="number" id="bank-balance" placeholder="Balance ₱" class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold" required>
+                    <input type="number" step="0.1" id="bank-interest" placeholder="Interest % p.a." class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none" required>
+                    <button type="submit" class="w-full py-4 bg-orange-500 text-white rounded-2xl font-black shadow-lg shadow-orange-500/20">Add Bank</button>
+                </form>
+                <div id="bank-list-display" class="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+            </div>
+        </div>
+
+        <!-- Growth Simulator -->
+        <div id="growth" class="tab-content hidden space-y-8 animate-in fade-in">
+            <div class="flex justify-between items-center">
+                <div><h2 class="text-3xl font-black">Reports</h2><p class="text-gray-400 text-sm font-medium">Cashflow trends</p></div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 bg-white dark:bg-gray-900 p-10 rounded-[3rem] shadow-sm border border-gray-100 dark:border-gray-800">
+                    <h4 class="font-black mb-10 text-xl"><i class="fas fa-chart-bar text-orange-500 mr-2"></i> Performance (6 Months)</h4>
+                    <div class="h-80 w-full">
+                        <canvas id="monthlyBarChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-green-600 p-10 rounded-[3rem] text-white shadow-xl shadow-green-500/20">
+                    <h4 class="font-black mb-4 text-2xl">💰 Compound Power</h4>
+                    <p class="text-sm opacity-90 leading-relaxed italic">"Do not save what is left after spending, but spend what is left after saving."</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- Modal for New Goal -->
+<div id="fund-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-lg p-10 rounded-[3rem] shadow-2xl animate-in zoom-in-95 duration-200">
+        <h3 class="text-2xl font-black mb-8">New Sinking Fund</h3>
+        <form id="fund-form" class="space-y-4">
+            <input type="text" id="fund-name" placeholder="Fund name" class="w-full p-5 bg-gray-50 dark:bg-gray-800 rounded-3xl outline-none" required>
+            <div class="grid grid-cols-2 gap-4">
+                <input type="number" id="fund-target" placeholder="Target Amount ₱" class="p-5 bg-gray-50 dark:bg-gray-800 rounded-3xl outline-none font-bold" required>
+                <input type="date" id="fund-deadline" class="p-5 bg-gray-50 dark:bg-gray-800 rounded-3xl outline-none text-sm" required>
+            </div>
+            <select id="fund-category" class="w-full p-5 bg-gray-50 dark:bg-gray-800 rounded-3xl outline-none">
+                <option value="Laptop">Laptop</option>
+                <option value="Trip">Trip</option>
+                <option value="Tuition">Tuition</option>
+                <option value="School Needs">School Needs</option>
+                <option value="Other">Other</option>
+            </select>
+            <div class="flex gap-4 pt-6">
+                <button type="submit" class="flex-1 py-5 bg-orange-500 text-white rounded-3xl font-black shadow-lg">Create Fund</button>
+                <button type="button" id="close-fund-modal" class="flex-1 py-5 bg-gray-100 dark:bg-gray-700 rounded-3xl font-black">Cancel</button>
+            </div>
+        </form>
     </div>
-    <script src="script.js"></script>
+</div>
+
+<!-- Modal for Add Money to Fund -->
+<div id="fund-add-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[101] flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-sm p-10 rounded-[2.5rem] shadow-2xl">
+        <h3 class="text-xl font-black mb-6">Add to Fund</h3>
+        <input type="number" id="fund-add-amount" placeholder="Amount ₱" class="w-full p-5 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold text-xl mb-6" required>
+        <div class="flex gap-4">
+            <button id="fund-add-confirm" class="flex-1 py-4 bg-orange-500 text-white rounded-2xl font-black shadow-lg">Add</button>
+            <button id="fund-add-cancel" class="flex-1 py-4 bg-gray-100 dark:bg-gray-700 rounded-2xl font-black">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>

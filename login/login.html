@@ -1,38 +1,110 @@
 <!DOCTYPE html>
-<html lang="en" class="bg-gray-100 dark:bg-gray-900">
-  <head>
+<html lang="en">
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-
+    <title>Login - Gastador</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  </head>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        orange: { 500: '#f97316' }
+                    }
+                }
+            }
+        };
+        // Pre-load theme
+        const theme = localStorage.getItem('theme');
+        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-950 transition-colors duration-300 flex items-center justify-center min-h-screen p-4">
 
-  <body class="flex items-center justify-center min-h-screen">
-    <form id="loginForm" class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full flex flex-col">
-      <h2 class="text-2xl font-semibold mb-6 text-gray-800">Login</h2>
+    <!-- Theme Toggle -->
+    <button id="theme-toggle" class="fixed top-6 right-6 z-50 p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 transition-all active:scale-95">
+        <i id="theme-icon" class="fas fa-sun text-orange-500"></i>
+    </button>
 
-      <input type="text" id="username" 
-             class="w-full border-b-2 border-gray-300 py-2 mb-4 focus:outline-none focus:border-orange-500" 
-             placeholder="Username" required />
-      
-      <input type="password" id="password" 
-             class="w-full border-b-2 border-gray-300 py-2 mb-8 focus:outline-none focus:border-orange-500" 
-             placeholder="Password" required />
+    <div class="bg-white dark:bg-gray-900 p-10 rounded-[2.5rem] shadow-2xl max-w-sm w-full border border-gray-100 dark:border-gray-800 animate-in fade-in duration-500">
+        <div class="text-center mb-8">
+            <div class="bg-orange-100 dark:bg-orange-500/10 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-wallet text-orange-500 text-2xl"></i>
+            </div>
+            <h2 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Login</h2>
+            <p class="text-gray-400 text-sm mt-2">Welcome back to Gastador</p>
+        </div>
 
-      <button type="submit" 
-              class="w-full bg-orange-500 text-white font-semibold py-3 rounded-md hover:bg-orange-600 transition-colors">
-        Login
-      </button>
+        <form id="loginForm" class="flex flex-col space-y-6">
+            <div>
+                <label for="username" class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">Username</label>
+                <input type="text" id="username" 
+                       class="w-full bg-gray-50 dark:bg-gray-800 border-none ring-1 ring-gray-100 dark:ring-gray-700 py-4 px-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 dark:text-white transition-all" 
+                       placeholder="Enter your username" required />
+            </div>
+            
+            <div>
+                <label for="password" class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">Password</label>
+                <div class="relative">
+                    <input type="password" id="password" 
+                           class="w-full bg-gray-50 dark:bg-gray-800 border-none ring-1 ring-gray-100 dark:ring-gray-700 py-4 px-5 pr-12 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 dark:text-white transition-all" 
+                           placeholder="Enter your password" required />
+                    <button type="button" id="toggle-login-password" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-500 transition-colors">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
 
-      <a href="../register/register.html" 
-         class="text-center text-sm text-orange-600 hover:underline mt-4">
-        Go to Register
-      </a>
-    </form>
+            <button type="submit" 
+                    class="w-full bg-orange-500 text-white font-black py-4 rounded-2xl hover:bg-orange-600 shadow-xl shadow-orange-500/20 active:scale-95 transition-all text-lg">
+                Login
+            </button>
+
+            <p class="text-center text-xs text-gray-400 mt-6">
+                Don't have an account? 
+                <a href="../register/register.html" class="text-orange-500 font-bold hover:underline">Register</a>
+            </p>
+        </form>
+    </div>
 
     <script src="login.js"></script>
-  </body>
+    <script>
+        // Theme toggle logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        function updateIcon(isDark) {
+            themeIcon.className = isDark ? "fas fa-moon text-blue-400" : "fas fa-sun text-orange-500";
+        }
+
+        updateIcon(document.documentElement.classList.contains('dark'));
+
+        themeToggle.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateIcon(isDark);
+        });
+
+        // Password visibility toggle
+        const toggleBtn = document.getElementById('toggle-login-password');
+        const passwordInput = document.getElementById('password');
+        toggleBtn.addEventListener('click', () => {
+            const icon = toggleBtn.querySelector('i');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    </script>
+</body>
 </html>
