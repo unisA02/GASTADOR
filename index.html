@@ -13,14 +13,14 @@
         
         // Auth check
         if (localStorage.getItem('isLoggedIn') !== 'true') {
-            window.location.href = 'login.html';
+            window.location.href = '../login/login.html';
         } else if (!localStorage.getItem('monthlyBudget')) {
             window.location.href = 'start.html';
         }
 
         function logout() {
             localStorage.removeItem('isLoggedIn');
-            window.location.href = 'login.html';
+            window.location.href = '../login/login.html';
         }
     </script>
     <script src="https://cdn.tailwindcss.com"></script>

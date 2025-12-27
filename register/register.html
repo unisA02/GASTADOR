@@ -78,7 +78,7 @@
                 </div>
             </div>
 
-            <div id="password-error" class="text-red-500 text-[10px] font-bold hidden px-1">Passwords do not match!</div>
+            <div id="error-message" class="text-red-500 text-[10px] font-bold hidden px-1"></div>
 
             <button type="submit" 
                     class="w-full bg-orange-500 text-white font-black py-4 rounded-2xl hover:bg-orange-600 shadow-xl shadow-orange-500/20 active:scale-95 transition-all text-lg mt-2">
@@ -92,37 +92,9 @@
         </form>
     </div>
 
+    <script src="../auth.js"></script>
+    <script src="register.js"></script>
     <script>
-        document.getElementById('registerForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const username = document.getElementById('reg-username').value.trim();
-            const gmail = document.getElementById('reg-gmail').value.trim();
-            const password = document.getElementById('reg-password').value;
-            const confirmPassword = document.getElementById('reg-confirm-password').value;
-            const errorDiv = document.getElementById('password-error');
-
-            if (password !== confirmPassword) {
-                errorDiv.classList.remove('hidden');
-                return;
-            }
-            errorDiv.classList.add('hidden');
-
-            const existingUser = localStorage.getItem('username');
-            // Reset finance data if a different user is registering
-            if (existingUser && existingUser !== username) {
-                const financeKeys = [
-                    "transactions", "sinkingFunds", "assets", "liabilities", 
-                    "banks", "categories", "monthlyBudget", "emergencyFund"
-                ];
-                financeKeys.forEach(key => localStorage.removeItem(key));
-            }
-
-            // Simple logic: save user to local storage and login
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('username', username);
-            localStorage.setItem('userEmail', gmail);
-            window.location.href = '../start.html';
-        });
 
         // Theme toggle logic
         const themeToggle = document.getElementById('theme-toggle');
