@@ -29,13 +29,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            // Save registration data to separate file
+            UserData.saveRegistrationData(username, email, result.user.name);
+
             // Reset finance data if switching users
             UserAuth.resetFinanceDataForNewUser(username);
 
-            // Set current user and redirect
+            // Set current user
             UserAuth.setCurrentUser(username);
+
+            // Reset all form inputs
+            document.getElementById('reg-username').value = '';
+            document.getElementById('reg-gmail').value = '';
+            document.getElementById('reg-password').value = '';
+            document.getElementById('reg-confirm-password').value = '';
+            errorDiv.classList.add('hidden');
+
+            // Redirect to start.html
             alert('Registration successful!');
-            window.location.href = '../index.html';
+            window.location.href = '../start.html';
         });
     }
 });
