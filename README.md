@@ -108,11 +108,11 @@ Long-term, Gastador aims to become a **financial operating system for students**
 ## ⚙️ Installation & Setup
 To run this project locally:
 1. Clone the repo: `git clone https://github.com/unisA02/GASTADOR.git`
-2. Install dependencies: `npm install` (or your specific command)
+2. Install dependencies: `npm install` 
 3. Start the app: `npm start`
 
 ## 👥 The Team
-- **[Your Name/Handle]** - [Your Role: e.g., Full Stack Developer]
+- **Eunice Almeyda** - BS Computer Science Student (UPLB)
 
 ---
 *This repository has been archived for hackathon judging purposes.*
