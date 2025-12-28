@@ -101,7 +101,7 @@
                 </div>
                 <div class="bg-white dark:bg-gray-900 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col justify-center">
                     <div class="flex justify-between items-center mb-1">
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest tracking-tighter">Guilt-Free Left</p>
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Guilt-Free Left</p>
                         <span id="budget-status"></span>
                     </div>
                     <h2 id="remaining-budget" class="text-2xl font-black">₱0.00</h2>
@@ -273,7 +273,7 @@
                     <h3 class="text-2xl font-black">Liabilities</h3>
                     <button id="toggle-liability-form" class="text-red-500 font-black text-sm uppercase tracking-widest">+ Add Debt</button>
                 </div>
-                <form id="liability-form" class="hidden grid grid-cols-1 md:grid-cols-4 gap-4 pb-8 border-b border-gray-50 dark:border-gray-800 animate-in fade-in">
+                <form id="liability-form" class="hidden grid-cols-1 md:grid-cols-4 gap-4 pb-8 border-b border-gray-50 dark:border-gray-800 animate-in fade-in">
                     <input type="text" id="debt-name" placeholder="Debt Name" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none" required>
                     <input type="number" id="debt-value" placeholder="Amount ₱" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold" required>
                     <input type="date" id="debt-date" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none text-sm" placeholder="Date (Optional)">
@@ -423,7 +423,7 @@
 </div>
 
 <!-- Modal for New Goal -->
-<div id="fund-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+<div id="fund-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-900 w-full max-w-lg p-10 rounded-[3rem] shadow-2xl animate-in zoom-in-95 duration-200">
         <h3 class="text-2xl font-black mb-8">New Sinking Fund</h3>
         <form id="fund-form" class="space-y-4">
@@ -456,7 +456,7 @@
 </div>
 
 <!-- Modal for Add Money to Fund -->
-<div id="fund-add-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[101] flex items-center justify-center p-4">
+<div id="fund-add-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[101] items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-900 w-full max-w-sm p-10 rounded-[2.5rem] shadow-2xl">
         <h3 class="text-xl font-black mb-6">Add to Fund</h3>
         <input type="number" id="fund-add-amount" placeholder="Amount ₱" class="w-full p-5 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold text-xl mb-6" required>

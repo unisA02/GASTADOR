@@ -248,7 +248,9 @@ function renderSinking() {
 
 function openFundAdd(id) {
     activeFundId = id;
-    document.getElementById("fund-add-modal").classList.remove("hidden");
+    const modal = document.getElementById("fund-add-modal");
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
 }
 
 // --- ASSETS & NET WORTH ---
@@ -475,8 +477,16 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("ef-reset-btn").onclick = () => { if(confirm("Reset emergency fund?")) { efData.active = false; efData.balance = 0; save(); renderEmergency(); } };
 
     // Sinking Fund logic
-    document.getElementById("open-fund-modal").onclick = () => document.getElementById("fund-modal").classList.remove("hidden");
-    document.getElementById("close-fund-modal").onclick = () => document.getElementById("fund-modal").classList.add("hidden");
+    document.getElementById("open-fund-modal").onclick = () => {
+        const modal = document.getElementById("fund-modal");
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+    };
+    document.getElementById("close-fund-modal").onclick = () => {
+        const modal = document.getElementById("fund-modal");
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+    };
     document.getElementById("fund-category").onchange = () => {
         const category = document.getElementById("fund-category").value;
         const customDiv = document.getElementById("fund-custom-category");
@@ -506,19 +516,28 @@ document.addEventListener("DOMContentLoaded", () => {
             category: finalCategory,
             saved: 0 
         }); 
-        save(); document.getElementById("fund-modal").classList.add("hidden"); renderSinking(); e.target.reset(); 
+        const modal = document.getElementById("fund-modal");
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+        save(); renderSinking(); e.target.reset(); 
         document.getElementById("fund-custom-category").classList.add("hidden");
     };
 
     // Incremental Add money for sinking fund
-    document.getElementById("fund-add-cancel").onclick = () => document.getElementById("fund-add-modal").classList.add("hidden");
+    document.getElementById("fund-add-cancel").onclick = () => {
+        const modal = document.getElementById("fund-add-modal");
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+    };
     document.getElementById("fund-add-confirm").onclick = () => {
         const amt = parseFloat(document.getElementById("fund-add-amount").value);
         if (amt && activeFundId) {
             const fund = sinkingFunds.find(f => f.id === activeFundId);
             if (fund) { fund.saved += amt; save(); renderSinking(); }
         }
-        document.getElementById("fund-add-modal").classList.add("hidden");
+        const modal = document.getElementById("fund-add-modal");
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
         document.getElementById("fund-add-amount").value = "";
     };
 
@@ -536,7 +555,17 @@ document.addEventListener("DOMContentLoaded", () => {
         save(); renderAssets(); e.target.reset(); document.getElementById("asset-form").classList.add("hidden"); 
     };
 
-    document.getElementById("toggle-liability-form").onclick = () => document.getElementById("liability-form").classList.toggle("hidden");
+    document.getElementById("toggle-liability-form").onclick = () => {
+        const form = document.getElementById("liability-form");
+        const isHidden = form.classList.contains("hidden");
+        if (isHidden) {
+            form.classList.remove("hidden");
+            form.classList.add("grid");
+        } else {
+            form.classList.add("hidden");
+            form.classList.remove("grid");
+        }
+    };
     document.getElementById("liability-form").onsubmit = (e) => {
         e.preventDefault();
         liabilities.push({ 
