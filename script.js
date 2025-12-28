@@ -165,6 +165,14 @@ function updateBudgetChart() {
 
 // --- TABS ---
 window.switchTab = (tabId) => {
+    // Handle about tab
+    if (tabId === 'about') {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+        document.getElementById('about').classList.remove('hidden');
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('nav-about').classList.add('active');
+        return;
+    }
     document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
     const target = document.getElementById(tabId);
     if (target) target.classList.remove('hidden');
@@ -260,7 +268,7 @@ function renderAssets() {
                 <div class="p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-500 rounded-xl"><i class="fas fa-cube"></i></div>
                 <div>
                     <span class="font-black text-sm block">${a.name}</span>
-                    <span class="text-[9px] text-gray-400 font-bold uppercase">${a.category || 'Other'} • ${a.date || 'Purchase Date'}</span>
+                    <span class="text-[9px] text-gray-400 font-bold uppercase">${a.category || 'Other'}${a.date ? ' • ' + a.date : ''}</span>
                 </div>
             </div>
             <div class="flex items-center gap-4">
@@ -279,7 +287,10 @@ function renderAssets() {
         div.innerHTML = `
             <div class="flex items-center gap-4">
                 <div class="p-3 bg-red-50 dark:bg-red-900/20 text-red-500 rounded-xl"><i class="fas fa-hand-holding-usd"></i></div>
-                <span class="font-black text-sm">${l.name}</span>
+                <div>
+                    <span class="font-black text-sm block">${l.name}</span>
+                    ${l.date ? `<span class="text-[9px] text-gray-400 font-bold uppercase">${l.date}</span>` : ''}
+                </div>
             </div>
             <div class="flex items-center gap-4">
                 <span class="font-black text-red-500">${formatCurrency(l.value)}</span>
@@ -309,12 +320,38 @@ function renderBanks() {
         div.innerHTML = `
             <button onclick="deleteBank(${i})" class="absolute top-6 right-6 opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-500 transition-all"><i class="fas fa-trash-alt text-xs"></i></button>
             <div class="flex justify-between items-start mb-6">
-                <div><h4 class="text-xl font-black">${b.name}</h4><span class="text-[9px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-black uppercase">${b.interest}% p.a.</span></div>
-                <i class="fas fa-university text-orange-100 text-3xl"></i>
+                <div><h4 class="text-xl font-black">${b.name}</h4><span class="text-[9px] bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 px-2 py-0.5 rounded-full font-black uppercase">${b.interest}% p.a.</span></div>
+                <i class="fas fa-university text-orange-100 dark:text-orange-500/20 text-3xl"></i>
             </div>
-            <h3 class="text-3xl font-black">${formatCurrency(b.balance)}</h3>`;
+            <h3 class="text-3xl font-black mb-4">${formatCurrency(b.balance)}</h3>
+            <div class="flex gap-2 mt-4">
+                <button onclick="openBankDeposit(${i})" class="flex-1 py-3 bg-green-500 text-white rounded-xl font-black text-sm hover:bg-green-600 transition-all">+ Deposit</button>
+                <button onclick="openBankWithdraw(${i})" class="flex-1 py-3 bg-red-500 text-white rounded-xl font-black text-sm hover:bg-red-600 transition-all">- Withdraw</button>
+            </div>`;
         list.appendChild(div);
     });
+}
+
+let activeBankIndex = null;
+
+function openBankDeposit(index) {
+    activeBankIndex = index;
+    const amount = prompt(`Deposit amount to ${banks[index].name}:`, "");
+    if (amount && parseFloat(amount) > 0) {
+        banks[index].balance += parseFloat(amount);
+        save();
+        renderBanks();
+    }
+}
+
+function openBankWithdraw(index) {
+    activeBankIndex = index;
+    const amount = prompt(`Withdraw amount from ${banks[index].name}:`, "");
+    if (amount && parseFloat(amount) > 0) {
+        banks[index].balance = Math.max(0, banks[index].balance - parseFloat(amount));
+        save();
+        renderBanks();
+    }
 }
 
 // --- GROWTH ---
@@ -423,13 +460,15 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     document.getElementById("ef-deposit-btn").onclick = () => { 
-        const amt = parseFloat(document.getElementById("ef-deposit-amount").value); 
-        if (amt > 0) { efData.balance += amt; save(); renderEmergency(); document.getElementById("ef-deposit-amount").value = ""; } 
+        const amtInput = document.getElementById("ef-deposit-amount");
+        const amt = parseFloat(amtInput.value) || efData.contribution; 
+        if (amt > 0) { efData.balance += amt; save(); renderEmergency(); amtInput.value = ""; } 
     };
 
     document.getElementById("ef-withdraw-btn").onclick = () => { 
-        const amt = parseFloat(document.getElementById("ef-deposit-amount").value); 
-        if (amt > 0) { efData.balance = Math.max(0, efData.balance - amt); save(); renderEmergency(); document.getElementById("ef-deposit-amount").value = ""; } 
+        const amtInput = document.getElementById("ef-deposit-amount");
+        const amt = parseFloat(amtInput.value) || efData.contribution; 
+        if (amt > 0) { efData.balance = Math.max(0, efData.balance - amt); save(); renderEmergency(); amtInput.value = ""; } 
     };
 
     document.getElementById("ef-edit-btn").onclick = () => { efData.active = false; renderEmergency(); };
@@ -438,17 +477,37 @@ document.addEventListener("DOMContentLoaded", () => {
     // Sinking Fund logic
     document.getElementById("open-fund-modal").onclick = () => document.getElementById("fund-modal").classList.remove("hidden");
     document.getElementById("close-fund-modal").onclick = () => document.getElementById("fund-modal").classList.add("hidden");
+    document.getElementById("fund-category").onchange = () => {
+        const category = document.getElementById("fund-category").value;
+        const customDiv = document.getElementById("fund-custom-category");
+        if (category === "Other") {
+            customDiv.classList.remove("hidden");
+            document.getElementById("fund-custom-category-input").required = true;
+        } else {
+            customDiv.classList.add("hidden");
+            document.getElementById("fund-custom-category-input").required = false;
+            document.getElementById("fund-custom-category-input").value = "";
+        }
+    };
+
     document.getElementById("fund-form").onsubmit = (e) => { 
         e.preventDefault(); 
+        const category = document.getElementById("fund-category").value;
+        const finalCategory = category === "Other" ? document.getElementById("fund-custom-category-input").value.trim() : category;
+        if (!finalCategory) {
+            alert("Please enter a custom category name");
+            return;
+        }
         sinkingFunds.push({ 
             id: Date.now(), 
             name: document.getElementById("fund-name").value, 
             target: parseFloat(document.getElementById("fund-target").value), 
             deadline: document.getElementById("fund-deadline").value, 
-            category: document.getElementById("fund-category").value,
+            category: finalCategory,
             saved: 0 
         }); 
         save(); document.getElementById("fund-modal").classList.add("hidden"); renderSinking(); e.target.reset(); 
+        document.getElementById("fund-custom-category").classList.add("hidden");
     };
 
     // Incremental Add money for sinking fund
@@ -472,7 +531,7 @@ document.addEventListener("DOMContentLoaded", () => {
             name: document.getElementById("asset-name").value, 
             value: parseFloat(document.getElementById("asset-value").value),
             category: document.getElementById("asset-category").value,
-            date: document.getElementById("asset-date").value
+            date: document.getElementById("asset-date").value || ""
         }); 
         save(); renderAssets(); e.target.reset(); document.getElementById("asset-form").classList.add("hidden"); 
     };
@@ -480,7 +539,11 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("toggle-liability-form").onclick = () => document.getElementById("liability-form").classList.toggle("hidden");
     document.getElementById("liability-form").onsubmit = (e) => {
         e.preventDefault();
-        liabilities.push({ name: document.getElementById("debt-name").value, value: parseFloat(document.getElementById("debt-value").value) });
+        liabilities.push({ 
+            name: document.getElementById("debt-name").value, 
+            value: parseFloat(document.getElementById("debt-value").value),
+            date: document.getElementById("debt-date").value || ""
+        });
         save(); renderAssets(); e.target.reset(); document.getElementById("liability-form").classList.add("hidden");
     };
 

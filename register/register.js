@@ -46,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
             errorDiv.classList.add('hidden');
 
             // Redirect to start.html
-            alert('Registration successful!');
             window.location.href = '../start.html';
         });
     }

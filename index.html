@@ -63,7 +63,7 @@
         <button onclick="switchTab('banks')" id="nav-banks" class="nav-btn" title="Digital Banks"><i class="fas fa-university"></i></button>
         <button onclick="switchTab('growth')" id="nav-growth" class="nav-btn" title="Reports"><i class="fas fa-seedling"></i></button>
         
-        <a href="about.html" class="nav-btn" title="About Gastador"><i class="fas fa-info-circle"></i></a>
+        <button onclick="switchTab('about')" id="nav-about" class="nav-btn" title="About Gastador"><i class="fas fa-info-circle"></i></button>
 
         <div class="mt-auto">
             <button id="theme-toggle" class="p-3 text-gray-400 hover:text-orange-500 transition-colors">
@@ -95,11 +95,11 @@
             </header>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-white dark:bg-gray-900 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800">
+                <div class="bg-white dark:bg-gray-900 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col justify-center">
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Monthly Limit</p>
                     <h2 id="display-budget" class="text-2xl font-black text-blue-600">₱0.00</h2>
                 </div>
-                <div class="bg-white dark:bg-gray-900 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800">
+                <div class="bg-white dark:bg-gray-900 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col justify-center">
                     <div class="flex justify-between items-center mb-1">
                         <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest tracking-tighter">Guilt-Free Left</p>
                         <span id="budget-status"></span>
@@ -109,11 +109,11 @@
                         <div id="budget-progress-bar" class="h-full bg-green-500 transition-all duration-700"></div>
                     </div>
                 </div>
-                <div class="bg-white dark:bg-gray-900 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800">
+                <div class="bg-white dark:bg-gray-900 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col justify-center">
                     <p class="text-[10px] font-black text-green-500 uppercase tracking-widest">Inflow</p>
                     <h2 id="income" class="text-2xl font-black text-green-500">₱0.00</h2>
                 </div>
-                <div class="bg-white dark:bg-gray-900 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800">
+                <div class="bg-white dark:bg-gray-900 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col justify-center">
                     <p class="text-[10px] font-black text-red-500 uppercase tracking-widest">Outflow</p>
                     <h2 id="expense" class="text-2xl font-black text-red-500">₱0.00</h2>
                 </div>
@@ -210,6 +210,7 @@
                            <button id="ef-withdraw-btn" class="px-8 bg-red-500 text-white rounded-2xl font-black shadow-xl">Withdraw</button>
                         </div>
                     </div>
+                    <p class="text-xs text-gray-400 dark:text-gray-500">Default amount: <span id="ef-default-amount-display" class="font-bold text-orange-500">₱0.00</span> (Monthly Contribution)</p>
                     <div class="flex justify-between">
                         <button id="ef-edit-btn" class="text-xs font-black text-blue-500 uppercase tracking-widest">Edit Goal</button>
                         <button id="ef-reset-btn" class="text-xs font-black text-gray-400 uppercase tracking-widest hover:text-red-500">Reset Plan</button>
@@ -257,7 +258,7 @@
                             <option value="Transportation">Transportation</option>
                             <option value="Other">Other</option>
                         </select>
-                        <input type="date" id="asset-date" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none text-sm" required>
+                        <input type="date" id="asset-date" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none text-sm" placeholder="Date (Optional)">
                         <div class="flex gap-2">
                            <button type="submit" class="flex-1 bg-black dark:bg-indigo-600 text-white rounded-2xl font-black">Add</button>
                            <button type="button" id="cancel-asset-btn" class="px-6 bg-gray-100 dark:bg-gray-700 rounded-2xl font-black">Cancel</button>
@@ -272,9 +273,10 @@
                     <h3 class="text-2xl font-black">Liabilities</h3>
                     <button id="toggle-liability-form" class="text-red-500 font-black text-sm uppercase tracking-widest">+ Add Debt</button>
                 </div>
-                <form id="liability-form" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4 pb-8 border-b border-gray-50 dark:border-gray-800 animate-in fade-in">
+                <form id="liability-form" class="hidden grid grid-cols-1 md:grid-cols-4 gap-4 pb-8 border-b border-gray-50 dark:border-gray-800 animate-in fade-in">
                     <input type="text" id="debt-name" placeholder="Debt Name" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none" required>
                     <input type="number" id="debt-value" placeholder="Amount ₱" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold" required>
+                    <input type="date" id="debt-date" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none text-sm" placeholder="Date (Optional)">
                     <button type="submit" class="bg-red-500 text-white rounded-2xl font-black">Save Debt</button>
                 </form>
                 <div id="liability-list-display" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
@@ -303,6 +305,16 @@
             <div class="flex justify-between items-center">
                 <div><h2 class="text-3xl font-black">Reports</h2><p class="text-gray-400 text-sm font-medium">Cashflow trends</p></div>
             </div>
+            <div class="bg-white dark:bg-gray-900 p-6 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-800 mb-6">
+                <h4 class="font-black mb-3 text-lg flex items-center gap-2"><i class="fas fa-info-circle text-orange-500"></i> How to Add Entries</h4>
+                <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                    <p><strong class="text-gray-900 dark:text-gray-200">1. Go to Dashboard:</strong> Click the Dashboard tab in the sidebar.</p>
+                    <p><strong class="text-gray-900 dark:text-gray-200">2. Add Transaction:</strong> Use the "New Entry" form to add income or expenses.</p>
+                    <p><strong class="text-gray-900 dark:text-gray-200">3. Select Type:</strong> Choose "Expense" (red) or "Income" (green) button.</p>
+                    <p><strong class="text-gray-900 dark:text-gray-200">4. Fill Details:</strong> Enter category, amount, and date, then click "Save Expense" or "Save Income".</p>
+                    <p><strong class="text-gray-900 dark:text-gray-200">5. View Reports:</strong> Your entries automatically appear in this Reports section showing 6 months of cashflow trends.</p>
+                </div>
+            </div>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 bg-white dark:bg-gray-900 p-10 rounded-[3rem] shadow-sm border border-gray-100 dark:border-gray-800">
                     <h4 class="font-black mb-10 text-xl"><i class="fas fa-chart-bar text-orange-500 mr-2"></i> Performance (6 Months)</h4>
@@ -313,6 +325,96 @@
                 <div class="bg-green-600 p-10 rounded-[3rem] text-white shadow-xl shadow-green-500/20">
                     <h4 class="font-black mb-4 text-2xl">💰 Compound Power</h4>
                     <p class="text-sm opacity-90 leading-relaxed italic">"Do not save what is left after spending, but spend what is left after saving."</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Tab -->
+        <div id="about" class="tab-content hidden max-w-4xl mx-auto space-y-8">
+            <!-- Hero Section -->
+            <div class="bg-white dark:bg-gray-900 p-10 md:p-14 rounded-[3.5rem] shadow-2xl text-center border border-gray-100 dark:border-gray-800 animate-in zoom-in duration-300">
+                <div class="w-20 h-20 bg-orange-500 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-orange-500/20">
+                    <i class="fas fa-wallet text-3xl text-white"></i>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-black mb-6 dark:text-white uppercase tracking-tight">About Gastador</h1>
+                <p class="text-gray-600 dark:text-gray-300 leading-relaxed text-lg max-w-2xl mx-auto">
+                    Gastador is a dedicated financial management tool designed specifically for students to navigate their unique economic challenges. The platform focuses on transforming <span class="text-orange-500 font-bold">"gastos"</span> (spending) into smart financial habits by providing a clear, visual overview of where your money goes.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Core Purpose -->
+                <div class="bg-white dark:bg-gray-900 p-10 rounded-[3rem] shadow-sm border border-gray-100 dark:border-gray-800 h-full">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="p-3 bg-orange-100 dark:bg-orange-500/10 rounded-2xl text-orange-500">
+                            <i class="fas fa-bullseye text-xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-black dark:text-white">Core Purpose</h2>
+                    </div>
+                    <p class="text-gray-500 dark:text-gray-400 leading-relaxed">
+                        Managing a small allowance while balancing academic costs can be difficult. Gastador helps you maximize every peso by organizing your daily expenses and tracking your growth toward long-term financial security.
+                    </p>
+                </div>
+
+                <!-- Why Use Gastador? -->
+                <div class="bg-white dark:bg-gray-900 p-10 rounded-[3rem] shadow-sm border border-gray-100 dark:border-gray-800 h-full">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="p-3 bg-green-100 dark:bg-green-500/10 rounded-2xl text-green-500">
+                            <i class="fas fa-check-circle text-xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-black dark:text-white">Why Use It?</h2>
+                    </div>
+                    <ul class="space-y-4">
+                        <li class="flex gap-3">
+                            <i class="fas fa-magic text-orange-500 mt-1"></i>
+                            <span class="text-gray-500 dark:text-gray-400"><strong class="text-gray-700 dark:text-gray-200">Simplicity:</strong> Clean interface with light and dark modes.</span>
+                        </li>
+                        <li class="flex gap-3">
+                            <i class="fas fa-graduation-cap text-orange-500 mt-1"></i>
+                            <span class="text-gray-500 dark:text-gray-400"><strong class="text-gray-700 dark:text-gray-200">Insights:</strong> Educational tips on interest rates & PDIC.</span>
+                        </li>
+                        <li class="flex gap-3">
+                            <i class="fas fa-user-shield text-orange-500 mt-1"></i>
+                            <span class="text-gray-500 dark:text-gray-400"><strong class="text-gray-700 dark:text-gray-200">Privacy:</strong> Data is stored locally on your device.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Key Features -->
+            <div class="bg-white dark:bg-gray-900 p-10 md:p-14 rounded-[3.5rem] shadow-sm border border-gray-100 dark:border-gray-800">
+                <h2 class="text-3xl font-black dark:text-white mb-10 text-center uppercase tracking-tight">Key Features for Students</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="space-y-3">
+                        <i class="fas fa-bolt text-orange-500 text-2xl"></i>
+                        <h4 class="font-bold dark:text-gray-100">Real-Time Tracking</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Set a budget and instantly see remaining balance for meals, commute, or supplies.</p>
+                    </div>
+                    <div class="space-y-3">
+                        <i class="fas fa-chart-pie text-orange-500 text-2xl"></i>
+                        <h4 class="font-bold dark:text-gray-100">Visual Overviews</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Interactive charts categorize spending to help identify habits draining your wallet.</p>
+                    </div>
+                    <div class="space-y-3">
+                        <i class="fas fa-piggy-bank text-orange-500 text-2xl"></i>
+                        <h4 class="font-bold dark:text-gray-100">Sinking Funds</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Plan for laptops or trips by setting dedicated savings goals with deadlines.</p>
+                    </div>
+                    <div class="space-y-3">
+                        <i class="fas fa-shield-alt text-orange-500 text-2xl"></i>
+                        <h4 class="font-bold dark:text-gray-100">EF Builder</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Prioritize a safety net for unexpected school fees or personal emergencies.</p>
+                    </div>
+                    <div class="space-y-3">
+                        <i class="fas fa-chart-line text-orange-500 text-2xl"></i>
+                        <h4 class="font-bold dark:text-gray-100">Asset Management</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Track digital bank balances and physical investments in one health overview.</p>
+                    </div>
+                    <div class="space-y-3">
+                        <i class="fas fa-university text-orange-500 text-2xl"></i>
+                        <h4 class="font-bold dark:text-gray-100">Banking Integration</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Recommendations for high-interest banks like Seabank, Maya, and CIMB.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -328,15 +430,23 @@
             <input type="text" id="fund-name" placeholder="Fund name" class="w-full p-5 bg-gray-50 dark:bg-gray-800 rounded-3xl outline-none" required>
             <div class="grid grid-cols-2 gap-4">
                 <input type="number" id="fund-target" placeholder="Target Amount ₱" class="p-5 bg-gray-50 dark:bg-gray-800 rounded-3xl outline-none font-bold" required>
-                <input type="date" id="fund-deadline" class="p-5 bg-gray-50 dark:bg-gray-800 rounded-3xl outline-none text-sm" required>
+                <div>
+                    <input type="date" id="fund-deadline" class="w-full p-5 bg-gray-50 dark:bg-gray-800 rounded-3xl outline-none text-sm" required>
+                    <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-1 ml-2">Target Date</p>
+                </div>
             </div>
-            <select id="fund-category" class="w-full p-5 bg-gray-50 dark:bg-gray-800 rounded-3xl outline-none">
-                <option value="Laptop">Laptop</option>
-                <option value="Trip">Trip</option>
-                <option value="Tuition">Tuition</option>
-                <option value="School Needs">School Needs</option>
-                <option value="Other">Other</option>
-            </select>
+            <div>
+                <select id="fund-category" class="w-full p-5 bg-gray-50 dark:bg-gray-800 rounded-3xl outline-none">
+                    <option value="Laptop">Laptop</option>
+                    <option value="Trip">Trip</option>
+                    <option value="Tuition">Tuition</option>
+                    <option value="School Needs">School Needs</option>
+                    <option value="Other">Other</option>
+                </select>
+                <div id="fund-custom-category" class="hidden mt-3">
+                    <input type="text" id="fund-custom-category-input" placeholder="Enter custom category name" class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none text-sm">
+                </div>
+            </div>
             <div class="flex gap-4 pt-6">
                 <button type="submit" class="flex-1 py-5 bg-orange-500 text-white rounded-3xl font-black shadow-lg">Create Fund</button>
                 <button type="button" id="close-fund-modal" class="flex-1 py-5 bg-gray-100 dark:bg-gray-700 rounded-3xl font-black">Cancel</button>

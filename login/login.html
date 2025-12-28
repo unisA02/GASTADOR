@@ -17,47 +17,56 @@
                 }
             }
         };
-        // Pre-load theme
+        // Pre-load theme with synchronized transitions
         const theme = localStorage.getItem('theme');
         if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         }
+        // Add transition class to html for synchronized theme changes
+        document.documentElement.style.transition = 'background-color 0.3s ease, color 0.3s ease';
     </script>
 </head>
-<body class="bg-gray-100 dark:bg-gray-950 transition-colors duration-300 flex items-center justify-center min-h-screen p-4">
+<body class="bg-gray-100 dark:bg-gray-950 transition-colors duration-300 ease-in-out flex items-center justify-center min-h-screen p-4 overflow-hidden">
 
     <!-- Theme Toggle -->
     <button id="theme-toggle" class="fixed top-6 right-6 z-50 p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 transition-all active:scale-95">
         <i id="theme-icon" class="fas fa-sun text-orange-500"></i>
     </button>
 
-    <div class="bg-white dark:bg-gray-900 p-10 rounded-[2.5rem] shadow-2xl max-w-sm w-full border border-gray-100 dark:border-gray-800 animate-in fade-in duration-500">
+    <div class="bg-white dark:bg-gray-900 p-10 rounded-[2.5rem] shadow-2xl max-w-sm w-full border border-gray-100 dark:border-gray-800 transition-colors duration-300 ease-in-out animate-in fade-in duration-500">
         <div class="text-center mb-8">
-            <div class="bg-orange-100 dark:bg-orange-500/10 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-wallet text-orange-500 text-2xl"></i>
+            <div class="bg-orange-100 dark:bg-orange-500/10 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 transition-colors duration-300 ease-in-out">
+                <i class="fas fa-sign-in-alt text-orange-500 text-2xl transition-colors duration-300 ease-in-out"></i>
             </div>
-            <h2 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Login</h2>
-            <p class="text-gray-400 text-sm mt-2">Welcome back to Gastador</p>
+            <h2 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight transition-colors duration-300 ease-in-out">Login</h2>
+            <p class="text-gray-400 dark:text-gray-500 text-sm mt-2 transition-colors duration-300 ease-in-out">Welcome back to Gastador</p>
         </div>
 
         <form id="loginForm" class="flex flex-col space-y-6">
+            <div id="login-error-message" class="text-red-500 text-xs font-bold hidden px-1 mb-2 transition-all duration-300"></div>
+            
             <div>
-                <label for="username" class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">Username</label>
+                <label for="username" class="block text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2 ml-1 transition-colors duration-300 ease-in-out">Username</label>
                 <input type="text" id="username" 
-                       class="w-full bg-gray-50 dark:bg-gray-800 border-none ring-1 ring-gray-100 dark:ring-gray-700 py-4 px-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 dark:text-white transition-all" 
-                       placeholder="Enter your username" required />
+                       class="w-full bg-gray-50 dark:bg-gray-800 border-none ring-1 ring-gray-100 dark:ring-gray-700 py-4 px-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 dark:text-white transition-all duration-300 ease-in-out text-base" 
+                       placeholder="Enter your username" autocomplete="off" required />
             </div>
             
             <div>
-                <label for="password" class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">Password</label>
+                <label for="password" class="block text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2 ml-1 transition-colors duration-300 ease-in-out">Password</label>
                 <div class="relative">
                     <input type="password" id="password" 
-                           class="w-full bg-gray-50 dark:bg-gray-800 border-none ring-1 ring-gray-100 dark:ring-gray-700 py-4 px-5 pr-12 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 dark:text-white transition-all" 
-                           placeholder="Enter your password" required />
-                    <button type="button" id="toggle-login-password" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-500 transition-colors">
+                           class="w-full bg-gray-50 dark:bg-gray-800 border-none ring-1 ring-gray-100 dark:ring-gray-700 py-4 px-5 pr-12 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 dark:text-white transition-all duration-300 ease-in-out text-base" 
+                           placeholder="Enter your password" autocomplete="off" required />
+                    <button type="button" id="toggle-login-password" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-500 transition-colors duration-300 ease-in-out">
                         <i class="fas fa-eye"></i>
                     </button>
                 </div>
+            </div>
+            
+            <div class="flex items-center">
+                <input type="checkbox" id="remember-me" class="w-4 h-4 text-orange-500 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 dark:focus:ring-orange-500 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                <label for="remember-me" class="ml-2 text-xs text-gray-600 dark:text-gray-400 transition-colors duration-300 ease-in-out">Remember my device/account</label>
             </div>
 
             <button type="submit" 
@@ -65,9 +74,9 @@
                 Login
             </button>
 
-            <p class="text-center text-xs text-gray-400 mt-6">
+            <p class="text-center text-xs text-gray-400 dark:text-gray-500 mt-6 transition-colors duration-300 ease-in-out">
                 Don't have an account? 
-                <a href="../register/register.html" class="text-orange-500 font-bold hover:underline">Register</a>
+                <a href="../register/register.html" class="text-orange-500 font-bold hover:underline transition-colors duration-300 ease-in-out">Register</a>
             </p>
         </form>
     </div>
@@ -86,9 +95,15 @@
         updateIcon(document.documentElement.classList.contains('dark'));
 
         themeToggle.addEventListener('click', () => {
+            // Add transition class to all elements for synchronized theme change
+            document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
             const isDark = document.documentElement.classList.toggle('dark');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
             updateIcon(isDark);
+            // Remove transition after animation completes
+            setTimeout(() => {
+                document.body.style.transition = '';
+            }, 300);
         });
 
         // Password visibility toggle
