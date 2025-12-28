@@ -111,7 +111,7 @@ To run this project locally:
 2. Install dependencies: `npm install` 
 3. Start the app: `npm start`
 
-## 👥 The Team
+## 👥 Created by:
 - **Eunice Almeyda** - BS Computer Science Student (UPLB)
 
 ---
